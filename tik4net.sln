@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tik4net", "tik4net\tik4net.csproj", "{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tik4net.ApiGenerator", "tik4net.ApiGenerator\tik4net.ApiGenerator.csproj", "{3EECB733-ADD3-496F-87A6-70F4393D0FDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Code analysis|Any CPU = Code analysis|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Code analysis|Any CPU.ActiveCfg = Code analysis|Any CPU
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Code analysis|Any CPU.Build.0 = Code analysis|Any CPU
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Code analysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Code analysis|Any CPU.Build.0 = Debug|Any CPU
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Debug|Any CPU.Build.0 = Debug|x86
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EECB733-ADD3-496F-87A6-70F4393D0FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
