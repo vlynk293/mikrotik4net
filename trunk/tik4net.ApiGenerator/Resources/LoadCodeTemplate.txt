@@ -1,0 +1,1 @@
+            Attributes.CreateAttribute("%PropertyDataName%", entityRow.GetValue("%PropertyDataName%"));
