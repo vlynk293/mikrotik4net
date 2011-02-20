@@ -1,8 +1,0 @@
-        /// <summary>
-        /// Row %PropertyDataName% property.
-        /// </summary>
-        public %FieldType% %PropertyName% 
-        { 
-            get { return Attributes.%GetMethod%("%PropertyDataName%"); }
-            set { Attributes.SetAttribute("%PropertyDataName%", value); }
-        }        	

@@ -1,0 +1,9 @@
+        /// <summary>
+        /// Row %PropertyDataName% property.
+        /// </summary>
+        [TikProperty("%PropertyDataName%", typeof(%FieldType%), %Mandatory%, TikPropertyEditMode.%PropertyEditMode%)]
+        public %FieldType% %PropertyName% 
+        { 
+            get { throw new NotImplementedException("TODO"); /*TODO DataProperty: %PropertyDataName% */ }
+            set { throw new NotImplementedException("TODO"); }
+        }        	

@@ -1,0 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Tik4Net.Objects%EntityDotedPath%
+{   
+    /// <summary>
+    /// Represents one row in %EntityPath% on mikrotik router.
+    /// </summary>
+    public sealed partial class %EntityName%: TikEntityBase
+    {
+        %EntityProperties%
+    }
+
+    /// <summary>
+    /// Represents list of rows in %EntityPath% on mikrotik router - CUSTOM CODE.
+    /// </summary>    
+    public sealed partial class %EntityName%List //: %ListType%<%EntityName%>
+    {
+		//TODO Custom LOAD methods to match filtering needs
+    }           
+}
