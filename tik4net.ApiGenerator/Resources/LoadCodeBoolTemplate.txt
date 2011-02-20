@@ -1,1 +1,0 @@
-            Attributes.CreateAttribute("%PropertyDataName%", string.Equals(entityRow.GetValue("%PropertyDataName%"), "true", StringComparison.OrdinalIgnoreCase));

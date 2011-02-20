@@ -91,26 +91,57 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttributeList.cs" />
-    <Compile Include="AttributeItem.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallAddressList.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
+      <DependentUpon>FirewallAddressList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallMangle.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallMangle.designer.cs">
+      <DependentUpon>FirewallMangle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Log.cs" />
+    <Compile Include="Objects\Log.designer.cs">
+      <DependentUpon>Log.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Queue\QueueTree.cs" />
+    <Compile Include="Objects\Queue\QueueTree.designer.cs">
+      <DependentUpon>QueueTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\System\SystemResources.cs" />
+    <Compile Include="Objects\System\SystemResources.designer.cs">
+      <DependentUpon>SystemResources.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TikConnectorType.cs" />
+    <Compile Include="TikEntityAttribute.cs" />
+    <Compile Include="TikEntityMetadata.cs" />
+    <Compile Include="TikEntityEditMode.cs" />
+    <Compile Include="TikList.cs" />
+    <Compile Include="TikListMode.cs" />
+    <Compile Include="TikPropertyEditMode.cs" />
+    <Compile Include="TikPropertyList.cs" />
+    <Compile Include="TikPropertyItem.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guard.cs" />
-    <Compile Include="Ip\Firewal\FirewalMangle.cs" />
-    <Compile Include="ITikReadableEntity.cs" />
+    <Compile Include="ITikList.cs" />
+    <Compile Include="ITikEntity.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TikListBase.cs" />
     <Compile Include="TikEntityBase.cs" />
-    <Compile Include="Queue\QueueTree.cs" />
-    <Compile Include="Session\Api\ApiEntityRow.cs" />
-    <Compile Include="Session\Api\ApiSession.cs" />
+    <Compile Include="Connector\Api\ApiEntityRow.cs" />
+    <Compile Include="Connector\Api\ApiConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ITikEntityRow.cs" />
-    <Compile Include="Session\ITikSession.cs" />
-    <Compile Include="Session\TikResponseParseException.cs" />
-    <Compile Include="Session\TikSessionException.cs" />
+    <Compile Include="Connector\ITikConnector.cs" />
+    <Compile Include="Connector\TikResponseParseException.cs" />
+    <Compile Include="Connector\TikConnectorException.cs" />
+    <Compile Include="TikPropertyAttribute.cs" />
+    <Compile Include="TikUnorderedList.cs" />
+    <Compile Include="TikSession.cs" />
+    <Compile Include="TikSingleRowList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sn.snk" />
@@ -125,8 +156,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Session\Ssh\" />
-    <Folder Include="Session\Telnet\" />
+    <Folder Include="Connector\Ssh\" />
+    <Folder Include="Connector\Telnet\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,6 +12,8 @@
     <AssemblyName>Mikrotik.ApiGenerator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -101,6 +103,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="StringHelper.cs" />
+    <Compile Include="TikPropertyParser.cs" />
+    <Compile Include="TikSourceGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\tik4net\tik4net.csproj">
@@ -109,19 +113,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ClassTemplate.txt" />
+    <None Include="Resources\AutoClassTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PropertyTemplate.txt" />
+    <None Include="Resources\AutoPropertyTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\LoadCodeTemplate.txt" />
+    <None Include="Resources\CustomPropertyTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\LoadCodeBoolTemplate.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\LoadCodeInt64Template.txt" />
+    <None Include="Resources\CustomClassTemplate.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -131,4 +132,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\tools\"
+copy "$(TargetDir)\tik4net.dll" "$(SolutionDir)\tools\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

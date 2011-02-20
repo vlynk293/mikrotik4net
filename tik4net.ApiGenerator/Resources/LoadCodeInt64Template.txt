@@ -1,1 +1,0 @@
-            Attributes.CreateAttribute("%PropertyDataName%", long.Parse(entityRow.GetValue("%PropertyDataName%"), System.Globalization.CultureInfo.CurrentCulture));
