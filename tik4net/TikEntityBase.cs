@@ -79,7 +79,7 @@ namespace Tik4Net
         }
 
         /// <summary>
-        /// See <see cref="ITikReadableEntity.LoadFromEntityRow"/> for details.
+        /// See <see cref="ITikEntity.LoadFromEntityRow"/> for details.
         /// Calls <see cref="OnCustomLoadFromEntityRow"/>.        
         /// </summary>
         /// <remarks>Sets object state to unmodified by <see cref="MarkClear"/> call!</remarks>
@@ -118,6 +118,9 @@ namespace Tik4Net
             //dummy
         }
 
+        /// <summary>
+        /// See <see cref="ITikEntity.IsDataEqual"/> for details.
+        /// </summary>
         public bool IsDataEqual(ITikEntity entity)
         {
             if (entity == null)
@@ -170,7 +173,7 @@ namespace Tik4Net
                 bool found;
                 bool modified;
                 bool hasValue;
-                properties.GetAttributeState(propPair.Key, out found, out modified, out hasValue);
+                properties.GetPropertyState(propPair.Key, out found, out modified, out hasValue);
                 if (found && modified)
                 {
                     string valueAsText;
@@ -181,7 +184,7 @@ namespace Tik4Net
                         if (propPair.Value.PropertyType == typeof(string))
                             valueAsText = properties.GetAsString(propPair.Key);
                         else if ((propPair.Value.PropertyType == typeof(long)) || propPair.Value.PropertyType == typeof(long?))
-                            valueAsText = properties.GetAsInt64(propPair.Key).ToString();
+                            valueAsText = properties.GetAsInt64(propPair.Key).ToString(CultureInfo.InvariantCulture);
                         else if ((propPair.Value.PropertyType == typeof(bool)) || (propPair.Value.PropertyType == typeof(bool?)))
                             valueAsText = properties.GetAsBoolean(propPair.Key) ? "yes" : "no";
                         else
@@ -194,6 +197,10 @@ namespace Tik4Net
             return result;
         }
 
+        /// <summary>
+        /// Assign property values and state flags from given <paramref name="entity"/>.
+        /// </summary>
+        /// <param name="entity">Source entity.</param>
         public void Assign(TikEntityBase entity)
         {
             //assign flags

@@ -10,10 +10,10 @@ using System.Text.RegularExpressions;
 namespace Tik4Net.Connector.Api
 {
     /// <summary>
-    /// <see cref="ITikSession"/> implementation that uses Mikrotik API to access router.
+    /// <see cref="ITikConnector"/> implementation that uses Mikrotik API to access router.
     /// </summary>
-    internal sealed class ApiConnector: ITikConnector
-    {
+    internal sealed class ApiConnector: ITikConnector, IDisposable
+    {        
         private const int API_DEFAULT_PORT = 8728;
         private TcpClient connection;
         private NetworkStream connectionStream;
@@ -21,17 +21,11 @@ namespace Tik4Net.Connector.Api
 
         #region ITikConnector Members
 
-        /// <summary>
-        /// See <see cref="ITikSession.Open(string, string, string)"/> for details.
-        /// </summary>
         public void Open(string host, string user, string password)
         {
             Open(host, API_DEFAULT_PORT, user, password);
         }
 
-        /// <summary>
-        /// See <see cref="ITikSession.Open(string, int, string, string)"/> for details.
-        /// </summary>
         public void Open(string host, int port, string user, string password)
         {
             //open connection
@@ -92,7 +86,7 @@ namespace Tik4Net.Connector.Api
         }
 
         /// <summary>
-        /// See <see cref="ITikSession.QueryDataRows"/> for details.
+        /// See <see cref="ITikConnector.QueryDataRows(string)"/> for details.
         /// </summary>
         public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath)
         {
@@ -100,7 +94,7 @@ namespace Tik4Net.Connector.Api
         }
 
         /// <summary>
-        /// See <see cref="ITikSession.QueryDataRows"/> for details.
+        /// See <see cref="ITikConnector.QueryDataRows(string,IEnumerable{string})"/> for details.
         /// </summary>
         public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList)
         {
@@ -112,26 +106,29 @@ namespace Tik4Net.Connector.Api
         }
 
         /// <summary>
-        /// See <see cref="ITikSession.QueryDataRows"/> for details.
+        /// See <see cref="ITikConnector.QueryDataRows(string,IEnumerable{string},TikConnectorQueryFilterDictionary)"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, IEnumerable<KeyValuePair<string, string>> filter)
+        public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
         {
             Guard.ArgumentNotNull(filter, "filter");
             EnsureLoggedOn();
 
-            string filterStr = string.Join("\n", filter.Select(p => string.Format("?{0}={1}", p.Key, p.Value)).ToArray());
+            string filterStr = string.Join("\n", filter.Select(p => string.Format(CultureInfo.InvariantCulture, "?{0}={1}", p.Key, p.Value)).ToArray());
             List<ApiEntityRow> result = QueryDataRowsInternal(entityPath, propertyList, filterStr);
 
             return result.Cast<ITikEntityRow>().ToList();
         }
 
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteCreate"/> for details.
+        /// </summary>
         public string ExecuteCreate(string entityPath, Dictionary<string, string> values)
         {
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
             if (values.Count <= 0)
                 throw new ArgumentException("No specified values in ExecuteAdd.", "values");
 
-            string valuesStr = string.Join("\n", values.Select(p => string.Format("={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
+            string valuesStr = string.Join("\n", values.Select(p => string.Format(CultureInfo.InvariantCulture,"={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
             string executePath = entityPath + "/add"; //ip/address/add
             string command = executePath + "\n" + valuesStr; 
 
@@ -154,6 +151,9 @@ namespace Tik4Net.Connector.Api
                 return match.Groups["ID"].Value;
         }
 
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteUpdate"/> for details.
+        /// </summary>
         public void ExecuteUpdate(string entityPath, string id, Dictionary<string, string> values)
         {
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
@@ -161,9 +161,9 @@ namespace Tik4Net.Connector.Api
             if (values.Count <= 0)
                 throw new ArgumentException("No specified values in ExecuteUpdate.", "values");
 
-            string valuesStr = string.Join("\n", values.Select(p => string.Format("={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
+            string valuesStr = string.Join("\n", values.Select(p => string.Format(CultureInfo.InvariantCulture, "={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
             string executePath = entityPath + "/set"; //ip/address/set
-            string command = executePath + "\n" + string.Format("=.id={0}", id) + "\n" + valuesStr;
+            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=.id={0}", id) + "\n" + valuesStr;
 
             WriteMultilineCommand(command);
             List<string> response = ReadResponse();
@@ -178,13 +178,16 @@ namespace Tik4Net.Connector.Api
                 throw new TikConnectorException("Unknown response format in ExecuteUpdate.\n{0}", string.Join("\n", response.ToArray()));
         }
 
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteDelete"/> for details.
+        /// </summary>
         public void ExecuteDelete(string entityPath, string id)
         {
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
             Guard.ArgumentNotNullOrEmptyString(id, "id");
 
             string executePath = entityPath + "/remove"; //ip/address/remove
-            string command = executePath + "\n" + string.Format("=.id={0}", id);
+            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=.id={0}", id);
 
             WriteMultilineCommand(command);
             List<string> response = ReadResponse();
@@ -199,6 +202,9 @@ namespace Tik4Net.Connector.Api
                 throw new TikConnectorException("Unknown response format in ExecuteDelete.\n{0}", string.Join("\n", response.ToArray()));
         }
 
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteMove"/> for details.
+        /// </summary>
         public void ExecuteMove(string entityPath, string idToMove, string idToMoveBefore)
         {
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
@@ -207,12 +213,12 @@ namespace Tik4Net.Connector.Api
 
             //this will move queue witdh ID before queue with ID2
             //Code:
-            ///queue/simple/move
+            // /queue/simple/move
             //=numbers=<queue id>
             //=destination=<queue id2>
             //http://forum.mikrotik.com/viewtopic.php?f=9&t=29390
             string executePath = entityPath + "/move"; //ip/address/move
-            string command = executePath + "\n" + string.Format("=numbers={0}\n=destination={1}", idToMove, idToMoveBefore);
+            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=numbers={0}\n=destination={1}", idToMove, idToMoveBefore);
 
             WriteMultilineCommand(command);
             List<string> response = ReadResponse();
@@ -307,7 +313,7 @@ namespace Tik4Net.Connector.Api
             }
             if (length < 0x10000000)
             {
-                byte[] tmp = BitConverter.GetBytes(length | 0xE0000000);
+                byte[] tmp = BitConverter.GetBytes((uint)length | 0xE0000000);
                 return new byte[4] { tmp[3], tmp[2], tmp[1], tmp[0] };
             }
             else
@@ -359,7 +365,7 @@ namespace Tik4Net.Connector.Api
                 if (tmp[3] == 0)
                 {
                     output.Add(o.TrimEnd('\n'));                
-                    if (o.StartsWith("!done"))//(o.Substring(0, 5) == "!done")
+                    if (o.StartsWith("!done", StringComparison.Ordinal))//(o.Substring(0, 5) == "!done")
                     {
                         break;
                     }
@@ -428,7 +434,7 @@ namespace Tik4Net.Connector.Api
                     o += '\n';
             }
             if (connectionStream.DataAvailable)
-                throw new Exception("Not all data read - propably you send more than one command in one request.");
+                throw new TikConnectorException("Not all data read - propably you send more than one command in one request.");
             return output;
         }
 
@@ -440,5 +446,18 @@ namespace Tik4Net.Connector.Api
         }
 
         //http://ayufan.eu/projects/rosapi/repository/entry/trunk/routeros.class.php
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Calls <see cref="Close"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
+        }
+
+        #endregion
     }
 }

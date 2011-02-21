@@ -210,10 +210,18 @@ namespace Tik4Net
                 return item.HasValue;
         }
 
-        public void GetAttributeState(string attributeName, out bool found, out bool modified, out bool hasValue)
+        /// <summary>
+        /// Gets the state of the property.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="found">if property has been found in list.</param>
+        /// <param name="modified">if property value has been modified.</param>
+        /// <param name="hasValue">if property has value (is not null).</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "3#"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#")]
+        public void GetPropertyState(string propertyName, out bool found, out bool modified, out bool hasValue)
         {
             TikPropertyItem item;
-            if (!items.TryGetValue(attributeName, out item))
+            if (!items.TryGetValue(propertyName, out item))
             {
                 found = false;
                 modified = false;
@@ -227,6 +235,13 @@ namespace Tik4Net
             }
         }
 
+        /// <summary>
+        /// Determines whether is data-equal with the specified <paramref name="tikPropertyList"/>.
+        /// </summary>
+        /// <param name="tikPropertyList">The tik property list to compare.</param>
+        /// <returns>
+        /// 	<c>true</c> if is data-equal with the specified <paramref name="tikPropertyList"/>; otherwise, <c>false</c>.
+        /// </returns>
         public bool IsDataEqual(TikPropertyList tikPropertyList)
         {
             foreach (KeyValuePair<string, TikPropertyItem> pair in items)

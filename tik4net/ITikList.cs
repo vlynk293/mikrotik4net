@@ -8,6 +8,7 @@ namespace Tik4Net
     /// <summary>
     /// Mikrotik entity (<see cref="ITikEntity"/>) list.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
     public interface ITikList
     {
         ///// <summary>

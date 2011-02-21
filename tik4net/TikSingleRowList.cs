@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace Tik4Net
 {
+    /// <summary>
+    /// <see cref="TikListBase{TEntity}"/> type that contains maximally one row.
+    /// </summary>
+    /// <seealso cref="TikListMode.SingleRow"/>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public abstract class TikSingleRowList<TEntity>: TikListBase<TEntity> 
         where TEntity : TikEntityBase, new()
     {
@@ -26,20 +33,28 @@ namespace Tik4Net
         {
         }
 
+        /// <summary>
+        /// See <see cref="TikListBase{TEntity}.VerifyResponseRows"/> for details.
+        /// Ensures that <paramref name="response"/> contains maximally one row.
+        /// </summary>
         protected override void VerifyResponseRows(IEnumerable<ITikEntityRow> response)
         {
             base.VerifyResponseRows(response);
 
             if (response.Count() > 1)
-                throw new InvalidOperationException(string.Format("There is not allowed more than row in result for {0}. Result contains {1} rows.", this, response.Count()));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "There is not allowed more than row in result for {0}. Result contains {1} rows.", this, response.Count()));
         }
 
+        /// <summary>
+        /// See <see cref="TikListBase{TEntity}.BeforeAdd"/> for details.
+        /// Ensures that list contains maximally one row (must be empty before call).
+        /// </summary>
         protected override void BeforeAdd(TEntity entity)
         {
             base.BeforeAdd(entity);
 
             if (Items.Count > 0)
-                throw new InvalidOperationException(string.Format("Can not add second row to SingleRowList '{0}'.", this));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Can not add second row to SingleRowList '{0}'.", this));
         }
     }
 }
