@@ -14,7 +14,7 @@ namespace Tik4Net.Connector
     public class TikConnectorException: Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikSessionException"/> class.
+        /// Initializes a new instance of the <see cref="TikConnectorException"/> class.
         /// </summary>
         /// <param name="info">The object that holds the serialized object data.</param>
         /// <param name="context">The contextual information about the source or destination.</param>
@@ -24,7 +24,7 @@ namespace Tik4Net.Connector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikSessionException"/> class.
+        /// Initializes a new instance of the <see cref="TikConnectorException"/> class.
         /// </summary>
         public TikConnectorException()
             : base()
@@ -32,7 +32,7 @@ namespace Tik4Net.Connector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikSessionException"/> class.
+        /// Initializes a new instance of the <see cref="TikConnectorException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
         public TikConnectorException(string message)
@@ -41,7 +41,7 @@ namespace Tik4Net.Connector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikSessionException"/> class.
+        /// Initializes a new instance of the <see cref="TikConnectorException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
@@ -51,7 +51,7 @@ namespace Tik4Net.Connector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikSessionException"/> class.
+        /// Initializes a new instance of the <see cref="TikConnectorException"/> class.
         /// </summary>
         /// <param name="message">The message (with format params).</param>
         /// <param name="args">The args (for message formating).</param>

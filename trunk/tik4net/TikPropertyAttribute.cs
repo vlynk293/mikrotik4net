@@ -29,6 +29,10 @@ namespace Tik4Net
         /// <value><c>true</c> if mandatory; otherwise, <c>false</c>.</value>
         public bool Mandatory { get; private set; }
 
+        /// <summary>
+        /// Gets the edit mode of property.
+        /// </summary>
+        /// <value>The edit mode of property.</value>
         public TikPropertyEditMode EditMode { get; private set; }
 
         /// <summary>
@@ -37,6 +41,7 @@ namespace Tik4Net
         /// <param name="propertyName">Name of the property (on mikrotik).</param>
         /// <param name="propertyType">Data type of the property.</param>
         /// <param name="mandatory">if set to <c>true</c> [mandatory].</param>
+        /// <param name="editMode">The property edit mode.</param>
         public TikPropertyAttribute(string propertyName, Type propertyType, bool mandatory, TikPropertyEditMode editMode)
         {
             Guard.ArgumentNotNull(propertyType, "propertyType");
@@ -48,10 +53,10 @@ namespace Tik4Net
             EditMode = editMode;
         }
 
-        public TikPropertyAttribute(string propertyName, Type propertyType, bool mandatory)
-            : this(propertyName, propertyType, mandatory, TikPropertyEditMode.Editable)
-        {
-        }
+        //public TikPropertyAttribute(string propertyName, Type propertyType, bool mandatory)
+        //    : this(propertyName, propertyType, mandatory, TikPropertyEditMode.Editable)
+        //{
+        //}
 
 
         ///// <summary>

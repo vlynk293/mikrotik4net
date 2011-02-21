@@ -5,9 +5,19 @@ using System.Text;
 
 namespace Tik4Net
 {
+    /// <summary>
+    /// Mode of <see cref="ITikEntity"/> editation.
+    /// </summary>
+    /// <seealso cref="TikPropertyEditMode"/>
     public enum TikEntityEditMode
     {
-        Editable,        
+        /// <summary>
+        /// Entity is editable (you can use setter of properties).
+        /// </summary>
+        Editable,
+        /// <summary>
+        /// Entity is R/O (property setters are not created).
+        /// </summary>
         ReadOnly,
     }
 }

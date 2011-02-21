@@ -111,6 +111,7 @@
     <Compile Include="Objects\System\SystemResources.designer.cs">
       <DependentUpon>SystemResources.cs</DependentUpon>
     </Compile>
+    <Compile Include="TikConnectorQueryFilterDictionary.cs" />
     <Compile Include="TikConnectorType.cs" />
     <Compile Include="TikEntityAttribute.cs" />
     <Compile Include="TikEntityMetadata.cs" />

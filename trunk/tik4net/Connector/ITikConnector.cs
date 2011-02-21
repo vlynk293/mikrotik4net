@@ -21,8 +21,6 @@ namespace Tik4Net.Connector
     /// </summary>
     public interface ITikConnector
     {
-        List<string> ExecuteAndReadResponse(string command);
-
         /// <summary>
         /// Opens connection to the specified mikrotik host on default port (depends on technology) and perform the logon operation.
         /// </summary>
@@ -48,17 +46,39 @@ namespace Tik4Net.Connector
         /// <seealso cref="Open(string, int, string, string)"/>
         void Close();
 
+        /// <summary>
+        /// Executes given <paramref name="command"/> and reads the response.
+        /// Could be used to very low-level usage of connector.
+        /// </summary>
+        /// <param name="command">The command to be executed.</param>
+        /// <returns>List of response rows.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        List<string> ExecuteAndReadResponse(string command);
+
+        /// <summary>
+        /// Creates the <see cref="ITikConnector"/> implementation specific <see cref="ITikEntityRow"/>.
+        /// (Factory method).
+        /// </summary>
+        /// <param name="entityRowData">The entity row data.</param>
+        /// <returns><see cref="ITikEntityRow"/> implementation instance specific for <see cref="ITikConnector"/> type.</returns>
         ITikEntityRow CreateEntityRow(string entityRowData);
+
         /// <summary>
         /// Queries the data rows (rows from which data entities can be constructed).
         /// </summary>
-        /// <param name="entityPath">The entity (in x/y/z notation).</param>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
         /// <returns>List of parsed data rows.</returns>
         IEnumerable<ITikEntityRow> QueryDataRows(string entityPath);
 
+        /// <summary>
+        /// Version of <see cref="QueryDataRows(string)"/> with list of properties to be read.
+        /// </summary>
         IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList);
 
-        IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, IEnumerable<KeyValuePair<string, string>> filter);
+        /// <summary>
+        /// Version of <see cref="QueryDataRows(string)"/> with list of properties to be read and list of proName-propValue filter pairs.
+        /// </summary>
+        IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
 
         ///// <summary>
         ///// Similar to <see cref="QueryDataRows"/> but constructs list of <typeparamref name="TEntity"/> 
@@ -73,12 +93,40 @@ namespace Tik4Net.Connector
         //List<IEntityRow> Query(string entity, Dictionary<string, string> filter)
         //    where TEntity: IReadableEntity, new(); //TODO
 
+        /// <summary>
+        /// Executes creation command for entity with given values.
+        /// </summary>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="values">The values (propertyName-propertyValue).</param>
+        /// <returns>Id of created entity.</returns>
         string ExecuteCreate(string entityPath, Dictionary<string, string> values);
 
+        /// <summary>
+        /// Executes delete command for entity with given values.
+        /// </summary>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="id">The id of entity to be deleted.</param>
         void ExecuteDelete(string entityPath, string id);
 
+        /// <summary>
+        /// Executes update command for entity with given values.
+        /// </summary>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="id">The id of entity to be updated.</param>
+        /// <param name="values">The values (propertyName-propertyValue) - null value means unset of value.</param>
         void ExecuteUpdate(string entityPath, string id, Dictionary<string, string> values);
 
+        /// <summary>
+        /// Executes move command for entitity with given <paramref name="idToMove"/>.
+        /// Moves given <paramref name="idToMove"/> BEFORE entity with <paramref name="idToMoveBefore"/>.
+        /// </summary>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="idToMove">The id of entity to move.</param>
+        /// <param name="idToMoveBefore">
+        /// The id of entity BEFORE which is <paramref name="idToMove"/> entity moved. If is null than 
+        /// given entity with <paramref name="idToMove"/> is moved to the end of list.
+        /// </param>
+        /// <remarks>Make sense only for <see cref="TikListMode.Ordered"/> lists of entities.</remarks>
         void ExecuteMove(string entityPath, string idToMove, string idToMoveBefore);
     }
 

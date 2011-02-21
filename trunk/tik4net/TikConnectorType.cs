@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tik4Net.Connector;
 
 namespace Tik4Net
 {
@@ -10,7 +11,7 @@ namespace Tik4Net
     /// </summary>
     /// <seealso cref="ITikConnector"/>
     public enum TikConnectorType
-    {
+    {        
         /// <summary>
         /// Uses Mikrotik API.
         /// </summary>

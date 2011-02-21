@@ -8,23 +8,46 @@ using Tik4Net.Connector;
 
 namespace Tik4Net
 {
+    /// <summary>
+    /// Base class for list of <see cref="TikEntityBase"/>.
+    /// Supports enumeration, Load access (<see cref="LoadAll"/>, <see cref="LoadItem"/>)
+    /// and Save access (<see cref="Save"/>).
+    /// <para>
+    /// Uses <see cref="TikSession"/> given in constructor or obtain by
+    /// <see cref="TikSession.ActiveSession"/> call.
+    /// </para>
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity in list.</typeparam>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public abstract class TikListBase<TEntity>: ITikList, IEnumerable<TEntity>
         where TEntity : TikEntityBase, new()
     {
         private readonly List<TEntity> items;
         private readonly TikSession session;
 
+        /// <summary>
+        /// Gets the items in list.
+        /// </summary>
+        /// <value>The items in list.</value>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         protected List<TEntity> Items
         {
             get { return items; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TikListBase&lt;TEntity&gt;"/> class with <see cref="TikSession.ActiveSession"/> session.
+        /// </summary>
         protected TikListBase()
             : this( TikSession.ActiveSession)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TikListBase&lt;TEntity&gt;"/> class with given <paramref name="session"/>.
+        /// </summary>
+        /// <param name="session">The session.</param>
         protected TikListBase(TikSession session)
         {
             Guard.ArgumentNotNull(session, "session");
@@ -34,58 +57,80 @@ namespace Tik4Net
         }
 
         #region -- ITEMS --
+
+        /// <summary>
+        /// Clears list of items.
+        /// </summary>
         protected virtual void Clear()
         {
             items.Clear();
             //TODO Clear changes
         }
 
+        /// <summary>
+        /// Adds the specified entity to the end of item list.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <remarks>Entity must be <see cref="TikEntityBase.IsMarkedNew"/> (it would be created on mikrotik during <see cref="Save"/>).</remarks>
         public void Add(TEntity entity)
         {
             Guard.ArgumentNotNull(entity, "entity");
             BeforeAdd(entity);
-
-            if (!entity.IsMarkedNew)
-                throw new InvalidOperationException("Can not add entity that is not IsMarkedNew.");            
             items.Add(entity);
         }
 
+        /// <summary>
+        /// Verifies given <paramref name="entity"/> if it could be added to list of items.
+        /// </summary>
+        /// <param name="entity">The entity to be verified.</param>
         protected virtual void BeforeAdd(TEntity entity)
         {
-            //dummy
+            if (!entity.IsMarkedNew)
+                throw new InvalidOperationException("Can not add entity that is not IsMarkedNew.");            
         }
 
         #endregion
 
         #region -- LOAD --
+        /// <summary>
+        /// Loads all items (without filtering).
+        /// Uses session from constructor.
+        /// </summary>
         public void LoadAll()
         {
             LoadInternal(null);
         }
 
+        /// <summary>
+        /// Loads one item by its id.
+        /// Uses session from constructor.
+        /// </summary>
+        /// <param name="id">The item id.</param>
+        /// <returns>Loaded item with given id or null.</returns>
         public TEntity LoadItem(string id)
         {
             Guard.ArgumentNotNullOrEmptyString(id, "id");
 
-            Dictionary<string, string> filter = new Dictionary<string, string>(1);
+            TikConnectorQueryFilterDictionary filter = new TikConnectorQueryFilterDictionary();
             filter.Add(".id", id);
 
             List<TEntity> loadedItems = LoadItemsInternal(filter, session);
             if (loadedItems.Count > 1)
-                throw new InvalidOperationException(string.Format("More than one item with id {0} returned in {1}.", id, GetType()));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "More than one item with id {0} returned in {1}.", id, GetType()));
             else if (loadedItems.Count == 0)
                 return null; //TODO or exception?
             else
                 return loadedItems[0];
         }
 
-        private void LoadInternal(Dictionary<string, string> filter)
+        private void LoadInternal(TikConnectorQueryFilterDictionary filter)
         {
             Clear();
             items.AddRange(LoadItemsInternal(filter, session));
         }
 
-        private List<TEntity> LoadItemsInternal(Dictionary<string, string> filter, TikSession session)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "session")]
+        private List<TEntity> LoadItemsInternal(TikConnectorQueryFilterDictionary filter, TikSession session)
         {
             List<TEntity> result = new List<TEntity>();
 
@@ -108,6 +153,11 @@ namespace Tik4Net
             return result;
         }
 
+        /// <summary>
+        /// Verifies the response rows - called after items load.
+        /// Method could be overriden to implement verify process.
+        /// </summary>
+        /// <param name="response">The response rows.</param>
         protected virtual void VerifyResponseRows(IEnumerable<ITikEntityRow> response)
         {
             //dummy
@@ -115,6 +165,11 @@ namespace Tik4Net
         #endregion
 
         #region -- SAVE --
+        /// <summary>
+        /// Saves this instance - saves all entities tha are in <see cref="TikEntityBase.IsModified"/>, 
+        /// <see cref="TikEntityBase.IsMarkedDeleted"/> and <see cref="TikEntityBase.IsMarkedNew"/> states.
+        /// Uses session from constructor.
+        /// </summary>
         public void Save()
         {
             TikEntityMetadata metadata = TikEntityMetadata.Get(typeof(TEntity));
@@ -129,16 +184,37 @@ namespace Tik4Net
             AfterSaveAllDeleted(metadata, session);
         }
 
+        /// <summary>
+        /// Called after all rows in <see cref="TikEntityBase.IsMarkedNew"/> are saved.
+        /// Method could be overriden to implement process.
+        /// </summary>
+        /// <param name="metadata">The entity metadata.</param>
+        /// <param name="session">The session to save with.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "session")]
         protected virtual void AfterSaveAllNew(TikEntityMetadata metadata, TikSession session)
         {
             //dummy
         }
 
+        /// <summary>
+        /// Called after all rows in <see cref="TikEntityBase.IsModified"/> are saved.
+        /// Method could be overriden to implement process.
+        /// </summary>
+        /// <param name="metadata">The entity metadata.</param>
+        /// <param name="session">The session to save with.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "session")]
         protected virtual void AfterSaveAllUpdated(TikEntityMetadata metadata, TikSession session)
         {
             //dummy
         }
 
+        /// <summary>
+        /// Called after all rows in <see cref="TikEntityBase.IsMarkedDeleted"/> are saved.
+        /// Method could be overriden to implement process.
+        /// </summary>
+        /// <param name="metadata">The entity metadata.</param>
+        /// <param name="session">The session to save with.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "session")]
         protected virtual void AfterSaveAllDeleted(TikEntityMetadata metadata, TikSession session)
         {
             //dummy
@@ -194,6 +270,12 @@ namespace Tik4Net
 
         #region IEnumerable<TEntity> Members
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+        /// </returns>
         public IEnumerator<TEntity> GetEnumerator()
         {
             return items.GetEnumerator();
