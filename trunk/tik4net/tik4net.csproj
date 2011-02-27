@@ -91,6 +91,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
+    <Compile Include="Connector\Api\IApiConnector.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
       <DependentUpon>FirewallAddressList.cs</DependentUpon>

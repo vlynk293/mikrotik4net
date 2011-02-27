@@ -36,3 +36,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Src", Scope = "member", Target = "Tik4Net.Objects.Ip.Firewall.FirewallMangle.#SrcAddress")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SrcAddress", Scope = "member", Target = "Tik4Net.Objects.Ip.Firewall.FirewallMangle.#SrcAddressList")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Src", Scope = "member", Target = "Tik4Net.Objects.Ip.Firewall.FirewallMangle.#SrcAddressList")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Tik4Net.Connector.Api")]

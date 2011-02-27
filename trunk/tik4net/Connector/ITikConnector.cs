@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Tik4Net.Connector
 {
@@ -21,6 +22,14 @@ namespace Tik4Net.Connector
     /// </summary>
     public interface ITikConnector
     {
+        /// <summary>
+        /// Creates the <see cref="ITikConnector"/> implementation specific <see cref="ITikEntityRow"/>.
+        /// (Factory method).
+        /// </summary>
+        /// <param name="entityRowData">The entity row data.</param>
+        /// <returns><see cref="ITikEntityRow"/> implementation instance specific for <see cref="ITikConnector"/> type.</returns>
+        ITikEntityRow CreateEntityRow(string entityRowData);
+
         /// <summary>
         /// Opens connection to the specified mikrotik host on default port (depends on technology) and perform the logon operation.
         /// </summary>
@@ -46,39 +55,38 @@ namespace Tik4Net.Connector
         /// <seealso cref="Open(string, int, string, string)"/>
         void Close();
 
-        /// <summary>
-        /// Executes given <paramref name="command"/> and reads the response.
-        /// Could be used to very low-level usage of connector.
-        /// </summary>
-        /// <param name="command">The command to be executed.</param>
-        /// <returns>List of response rows.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        List<string> ExecuteAndReadResponse(string command);
+        ///// <summary>
+        ///// Executes given <paramref name="command"/> and reads the response.
+        ///// Could be used to very low-level usage of connector.
+        ///// </summary>
+        ///// <param name="command">The command to be executed.</param>
+        ///// <returns>List of response rows.</returns>
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        //List<string> ExecuteAndReadResponse(string command);
 
-        /// <summary>
-        /// Creates the <see cref="ITikConnector"/> implementation specific <see cref="ITikEntityRow"/>.
-        /// (Factory method).
-        /// </summary>
-        /// <param name="entityRowData">The entity row data.</param>
-        /// <returns><see cref="ITikEntityRow"/> implementation instance specific for <see cref="ITikConnector"/> type.</returns>
-        ITikEntityRow CreateEntityRow(string entityRowData);
+        //List<string> ExecuteAndReadResponse(string command, bool exactlyOneRow);
+
+        //List<string> ExecuteAndReadResponse(string command, Regex exactlyOneRowRegex);
+
+        //List<string> ExecuteAndReadResponse(string command, bool exactlyOneRow,
+        //    Regex firstRowRegex, Regex lastRowRegex, Regex otherRowRegex);
 
         /// <summary>
         /// Queries the data rows (rows from which data entities can be constructed).
         /// </summary>
         /// <param name="entityPath">The entity (in x/y/z API notation).</param>
         /// <returns>List of parsed data rows.</returns>
-        IEnumerable<ITikEntityRow> QueryDataRows(string entityPath);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath);
 
         /// <summary>
-        /// Version of <see cref="QueryDataRows(string)"/> with list of properties to be read.
+        /// Version of <see cref="ExecuteReader(string)"/> with list of properties to be read.
         /// </summary>
-        IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList);
 
         /// <summary>
-        /// Version of <see cref="QueryDataRows(string)"/> with list of properties to be read and list of proName-propValue filter pairs.
+        /// Version of <see cref="ExecuteReader(string)"/> with list of properties to be read and list of proName-propValue filter pairs.
         /// </summary>
-        IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
 
         ///// <summary>
         ///// Similar to <see cref="QueryDataRows"/> but constructs list of <typeparamref name="TEntity"/> 
@@ -102,19 +110,28 @@ namespace Tik4Net.Connector
         string ExecuteCreate(string entityPath, Dictionary<string, string> values);
 
         /// <summary>
+        /// Executes update command for entity with given values (set values).
+        /// </summary>
+        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="id">The id of entity to be updated.</param>
+        /// <param name="values">The values (propertyName-propertyValue) - null value means unset of value.</param>
+        void ExecuteSet(string entityPath, string id, Dictionary<string, string> values);
+
+        /// <summary>
+        /// Executes update command for entity with given values (unset values).
+        /// </summary>
+        /// <param name="entityPath">The entity path.</param>
+        /// <param name="id">The id.</param>
+        /// <param name="properties">The properties to be unset.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        void ExecuteUnset(string entityPath, string id, List<string> properties);
+
+        /// <summary>
         /// Executes delete command for entity with given values.
         /// </summary>
         /// <param name="entityPath">The entity (in x/y/z API notation).</param>
         /// <param name="id">The id of entity to be deleted.</param>
         void ExecuteDelete(string entityPath, string id);
-
-        /// <summary>
-        /// Executes update command for entity with given values.
-        /// </summary>
-        /// <param name="entityPath">The entity (in x/y/z API notation).</param>
-        /// <param name="id">The id of entity to be updated.</param>
-        /// <param name="values">The values (propertyName-propertyValue) - null value means unset of value.</param>
-        void ExecuteUpdate(string entityPath, string id, Dictionary<string, string> values);
 
         /// <summary>
         /// Executes move command for entitity with given <paramref name="idToMove"/>.

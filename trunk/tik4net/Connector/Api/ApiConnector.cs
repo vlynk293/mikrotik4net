@@ -12,9 +12,18 @@ namespace Tik4Net.Connector.Api
     /// <summary>
     /// <see cref="ITikConnector"/> implementation that uses Mikrotik API to access router.
     /// </summary>
-    internal sealed class ApiConnector: ITikConnector, IDisposable
-    {        
+    internal sealed class ApiConnector : ITikConnector, IApiConnector, IDisposable
+    {
+        //Inspiration:
+        //  http://ayufan.eu/projects/rosapi/repository/entry/trunk/routeros.class.php
         private const int API_DEFAULT_PORT = 8728;
+        private static Regex trapRegex = new Regex(@"^!trap\s*(?<ERROR>.*)$");
+        private static Regex fatalRegex = new Regex(@"^!fatal\s*(?<ERROR>.*)$");
+        private static Regex logonResponseRegex = new Regex(@"^!done\n=ret=(?<HASH>[0-9a-f]+)$", RegexOptions.Singleline);
+        private static Regex doneRegex = new Regex(@"^!done$");
+        private static Regex dataRowRegex = new Regex(@"^!re");
+        private static Regex createResponseRegex = new Regex(@"^!done\s*=ret=(?<ID>.+)$");
+        private static Regex closeResponseRegex = new Regex(@"^!fatal\s*session terminated on request");
         private TcpClient connection;
         private NetworkStream connectionStream;
         private bool logged = false;
@@ -28,27 +37,24 @@ namespace Tik4Net.Connector.Api
 
         public void Open(string host, int port, string user, string password)
         {
+            if (logged)
+                throw new TikConnectorException("Already logged in");
             //open connection
             connection = new TcpClient();
             connection.Connect(host, port); 
             connectionStream = connection.GetStream();                        
 
             //logon
-            WriteCommand("/login");
-            string hash = ReadResponse()[0].Split(new string[] { "ret=" }, StringSplitOptions.None)[1];
-            string hashedPass = EncodePassword(password, hash);
-            WriteMultilineCommand(string.Format(CultureInfo.InvariantCulture, "/login\n=name={0}\n=response=00{1}", user, hashedPass));
-            List<string> result = ReadResponse();
-            //TODO result.Length
-            if (result[0] == "!done")
-            {
-                logged = true;
-            }
-            else
-            {
-                logged = false;
-                throw new TikConnectorException("Exception during connection: {0}", string.Join("\n", result.ToArray()));
-            }
+            string response = ExecuteAndReadResponse("/login", null, logonResponseRegex);
+            string hashedPass = ApiConnectorHelper.EncodePassword(password, logonResponseRegex.Match(response).Groups["HASH"].Value); //performace - logonResponseRegex is validated twice
+            ExecuteNonQuery("/login", 
+                new Dictionary<string, string> 
+                {
+                    {"=name", user},
+                    {"=response", "00" + hashedPass}
+                }); 
+
+            logged = true;
         }
 
         public void Close()
@@ -56,8 +62,13 @@ namespace Tik4Net.Connector.Api
             //logoff
             if (logged)
             {
-                WriteCommand("/quit"); //Does not work in 3.x (see links)
-                List<string> response = ReadResponse(); //!fatalsession terminated on request
+                string command = "/quit"; //Does not work in 3.x (see links)
+                WriteCommand(command); 
+                List<string> response = ReadResponse();
+                if ((response.Count != 1) || (!closeResponseRegex.IsMatch(response[0])))
+                    ValidateResponseRows(command, response, true, closeResponseRegex, null, null);
+                
+                //!fatalsession terminated on request
                 //http://forum.mikrotik.com/viewtopic.php?f=9&t=37075
                 //http://forum.mikrotik.com/viewtopic.php?f=9&t=44264
             }
@@ -76,193 +87,156 @@ namespace Tik4Net.Connector.Api
             return new ApiEntityRow(entityRowData);
         }
 
-        public List<string> ExecuteAndReadResponse(string command)
+        private List<string> ExecuteAndReadResponse(string command, Dictionary<string, string> parameters,
+            bool exactlyOneRow, Regex firstRowRegex, Regex lastRowRegex, Regex otherRowRegex)
         {
             Guard.ArgumentNotNullOrEmptyString(command, "command");
-            WriteMultilineCommand(command);
+
+            if ((parameters != null) && (parameters.Count > 0))
+                command += "\n" + string.Join("\n",  parameters.Select(p => p.Key + "=" + p.Value).ToArray());
+
+            WriteCommand(command);
             List<string> result = ReadResponse();
 
+            ValidateResponseRows(command, result, exactlyOneRow, firstRowRegex, lastRowRegex, otherRowRegex);
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="ITikConnector.QueryDataRows(string)"/> for details.
-        /// </summary>
-        public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath)
+        private string ExecuteAndReadResponse(string command, Dictionary<string, string> parameters, Regex exactlyOneRowRegex)
         {
-            return QueryDataRows(entityPath, null);
+            return ExecuteAndReadResponse(command, parameters, true, exactlyOneRowRegex, null, null)[0];
+        }
+
+        //For future use
+        //private List<string> ExecuteAndReadResponse(string command, Dictionary<string, string> parameters, bool exactlyOneRow)
+        //{
+        //    return ExecuteAndReadResponse(command, parameters, exactlyOneRow, null, null, null);
+        //}
+
+        //For future use
+        //private List<string> ExecuteAndReadResponse(string command, Dictionary<string, string> parameters)
+        //{
+        //    return ExecuteAndReadResponse(command, parameters, false, null, null, null);
+        //}
+
+        private void ExecuteNonQuery(string command, Dictionary<string, string> parameters)
+        {
+            ExecuteAndReadResponse(command, parameters, true, doneRegex, null, null);
+        }
+
+        public void ExecuteNonQuery(string command)
+        {
+            ExecuteNonQuery(command, null);
+        }
+
+        private static void ValidateResponseRows(string command, List<string> response, bool exactlyOneRow,
+            Regex firstRowRegex, Regex lastRowRegex, Regex otherRowRegex)
+        {
+            //!trap -> exception  
+            List<string> errors = new List<string>();
+            foreach (string row in response)
+            {
+                Match trapMatch = trapRegex.Match(row);
+                Match fatalMatch = fatalRegex.Match(row);
+                if (fatalMatch.Success)
+                    errors.Insert(0, string.Format(CultureInfo.CurrentCulture, "FATAL: {0}", fatalMatch.Groups["ERROR"].Value));
+                else if (trapMatch.Success)
+                    errors.Add(trapMatch.Groups["ERROR"].Value);                
+            }
+            if (errors.Count > 0)
+                throw new TikConnectorException("Target returns error.", command, errors, response); //TODO
+
+            //verify response row count
+            if (exactlyOneRow && (response.Count != 1))
+                throw new TikConnectorException("Target doesn't return exactly 1 row.", command, response);
+
+            //verify response rows
+            if (firstRowRegex != null)
+            {
+                if (response.Count == 0)
+                    throw new TikConnectorException("Target returns empty result.", command);
+                else if (!firstRowRegex.IsMatch(response[0]))
+                    throw new TikConnectorException("First row in result doesn't match given format.", command, firstRowRegex, response);
+            }
+
+            if (lastRowRegex != null)
+            {
+                if (response.Count == 0)
+                    throw new TikConnectorException("Target returns empty result.", command);
+                else if (((response.Count > 1) || (firstRowRegex == null)) 
+                    && (!lastRowRegex.IsMatch(response[response.Count - 1]))) //do not validate if exactly 1 row is returned and was verified by firstRowRegex
+                    throw new TikConnectorException("Last row in result doesn't match given format.", command, lastRowRegex, response);
+            }
+
+            if (otherRowRegex != null)
+            {
+                int startIdx = firstRowRegex == null ? 0 : 1;
+                int endIdx = lastRowRegex == null ? response.Count - 1 : response.Count - 2;
+                for (int i = startIdx; i <= endIdx; i++)
+                {
+                    if (!otherRowRegex.IsMatch(response[i]))
+                        throw new TikConnectorException(string.Format(CultureInfo.CurrentCulture, "{0}. response row in result doesn't match given format.", i)
+                            , command, otherRowRegex, response);
+                }
+            }               
         }
 
         /// <summary>
-        /// See <see cref="ITikConnector.QueryDataRows(string,IEnumerable{string})"/> for details.
+        /// See <see cref="ITikConnector.ExecuteReader(string)"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList)
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath)
+        {
+            return ExecuteReader(entityPath, null);
+        }
+
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteReader(string,IEnumerable{string})"/> for details.
+        /// </summary>
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList)
         {
             EnsureLoggedOn();
 
-            List<ApiEntityRow> result = QueryDataRowsInternal(entityPath, propertyList, null);
+            List<ApiEntityRow> result = ExecuteReaderInternal(entityPath, propertyList, null);
 
             return result.Cast<ITikEntityRow>().ToList();
         }
 
         /// <summary>
-        /// See <see cref="ITikConnector.QueryDataRows(string,IEnumerable{string},TikConnectorQueryFilterDictionary)"/> for details.
+        /// See <see cref="ITikConnector.ExecuteReader(string,IEnumerable{string},TikConnectorQueryFilterDictionary)"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> QueryDataRows(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
         {
             Guard.ArgumentNotNull(filter, "filter");
             EnsureLoggedOn();
 
-            string filterStr = string.Join("\n", filter.Select(p => string.Format(CultureInfo.InvariantCulture, "?{0}={1}", p.Key, p.Value)).ToArray());
-            List<ApiEntityRow> result = QueryDataRowsInternal(entityPath, propertyList, filterStr);
+            List<ApiEntityRow> result = ExecuteReaderInternal(entityPath, propertyList, filter);
 
             return result.Cast<ITikEntityRow>().ToList();
         }
 
-        /// <summary>
-        /// See <see cref="ITikConnector.ExecuteCreate"/> for details.
-        /// </summary>
-        public string ExecuteCreate(string entityPath, Dictionary<string, string> values)
+        private List<ApiEntityRow> ExecuteReaderInternal(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
         {
-            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
-            if (values.Count <= 0)
-                throw new ArgumentException("No specified values in ExecuteAdd.", "values");
+            // ip/address/print
+            // =detail=
+            // =.proplist=..,..,..,..
+            // ?address=10.10.10.10
 
-            string valuesStr = string.Join("\n", values.Select(p => string.Format(CultureInfo.InvariantCulture,"={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
-            string executePath = entityPath + "/add"; //ip/address/add
-            string command = executePath + "\n" + valuesStr; 
+            string command = string.Format(CultureInfo.InvariantCulture, "{0}/print", entityPath);
 
-            //TODO - refactor to WriteAndReadResponse
-            WriteMultilineCommand(command);
-            List<string> response = ReadResponse();
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("=detail", ""); //detail            
+            if ((propertyList != null) && propertyList.Any()) //.proplist  (if specified)
+                parameters.Add("=.proplist", string.Join(",", propertyList.ToArray()));
+            if (filter != null) //filter (if specified)
+            {
+                foreach(KeyValuePair<string, string> fltPair in filter)
+                {
+                    parameters.Add("?" + fltPair.Key, fltPair.Value); //TODO - convert from internal expression!!!
+#warning Not final code!
+                }
+            }
 
-            if (response[0].StartsWith("!trap", StringComparison.OrdinalIgnoreCase))
-                throw new TikConnectorException("API error: {0}", string.Join("\n", response.ToArray()));
-            //refactor end (or may be expected lines count and regex?)
-
-            if (response.Count != 1)
-                throw new TikConnectorException("Unknown response format in ExecuteAdd.\n{0}", string.Join("\n", response.ToArray()));
-
-            Regex responseRegex = new Regex(@"^!done\s*=ret=(?<ID>.+)$"); //!done=ret=*AEB18
-            Match match = responseRegex.Match(response[0]);
-            if (!match.Success) 
-                throw new TikConnectorException("Unknown response format in ExecuteAdd.\n{0}", string.Join("\n", response.ToArray()));
-            else
-                return match.Groups["ID"].Value;
-        }
-
-        /// <summary>
-        /// See <see cref="ITikConnector.ExecuteUpdate"/> for details.
-        /// </summary>
-        public void ExecuteUpdate(string entityPath, string id, Dictionary<string, string> values)
-        {
-            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
-            Guard.ArgumentNotNullOrEmptyString(id, "id");
-            if (values.Count <= 0)
-                throw new ArgumentException("No specified values in ExecuteUpdate.", "values");
-
-            string valuesStr = string.Join("\n", values.Select(p => string.Format(CultureInfo.InvariantCulture, "={0}={1}", p.Key, p.Value)).ToArray()); //=address=192.168.88.1/24
-            string executePath = entityPath + "/set"; //ip/address/set
-            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=.id={0}", id) + "\n" + valuesStr;
-
-            WriteMultilineCommand(command);
-            List<string> response = ReadResponse();
-
-            if (response[0].StartsWith("!trap", StringComparison.OrdinalIgnoreCase))
-                throw new TikConnectorException("API error: {0}", string.Join("\n", response.ToArray()));
-
-            if (response.Count != 1)
-                throw new TikConnectorException("Unknown response format in ExecuteUpdate.\n{0}", string.Join("\n", response.ToArray()));
-
-            if (response[0] != "!done")
-                throw new TikConnectorException("Unknown response format in ExecuteUpdate.\n{0}", string.Join("\n", response.ToArray()));
-        }
-
-        /// <summary>
-        /// See <see cref="ITikConnector.ExecuteDelete"/> for details.
-        /// </summary>
-        public void ExecuteDelete(string entityPath, string id)
-        {
-            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
-            Guard.ArgumentNotNullOrEmptyString(id, "id");
-
-            string executePath = entityPath + "/remove"; //ip/address/remove
-            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=.id={0}", id);
-
-            WriteMultilineCommand(command);
-            List<string> response = ReadResponse();
-
-            if (response[0].StartsWith("!trap", StringComparison.OrdinalIgnoreCase))
-                throw new TikConnectorException("API error: {0}", string.Join("\n", response.ToArray()));
-
-            if (response.Count != 1)
-                throw new TikConnectorException("Unknown response format in ExecuteDelete.\n{0}", string.Join("\n", response.ToArray()));
-
-            if (response[0] != "!done")
-                throw new TikConnectorException("Unknown response format in ExecuteDelete.\n{0}", string.Join("\n", response.ToArray()));
-        }
-
-        /// <summary>
-        /// See <see cref="ITikConnector.ExecuteMove"/> for details.
-        /// </summary>
-        public void ExecuteMove(string entityPath, string idToMove, string idToMoveBefore)
-        {
-            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
-            Guard.ArgumentNotNullOrEmptyString(idToMove, "idToMove");
-            Guard.ArgumentNotNullOrEmptyString(idToMoveBefore, "idToMoveBefore");
-
-            //this will move queue witdh ID before queue with ID2
-            //Code:
-            // /queue/simple/move
-            //=numbers=<queue id>
-            //=destination=<queue id2>
-            //http://forum.mikrotik.com/viewtopic.php?f=9&t=29390
-            string executePath = entityPath + "/move"; //ip/address/move
-            string command = executePath + "\n" + string.Format(CultureInfo.InvariantCulture, "=numbers={0}\n=destination={1}", idToMove, idToMoveBefore);
-
-            WriteMultilineCommand(command);
-            List<string> response = ReadResponse();
-
-            if (response[0].StartsWith("!trap", StringComparison.OrdinalIgnoreCase))
-                throw new TikConnectorException("API error: {0}", string.Join("\n", response.ToArray()));
-
-            if (response.Count != 1)
-                throw new TikConnectorException("Unknown response format in ExecuteMove.\n{0}", string.Join("\n", response.ToArray()));
-
-            if (response[0] != "!done")
-                throw new TikConnectorException("Unknown response format in ExecuteMove.\n{0}", string.Join("\n", response.ToArray()));
-        }
-
-
-        #endregion
-
-        private List<ApiEntityRow> QueryDataRowsInternal(string entityPath, IEnumerable<string> propertyList, string filterStr)
-        {
-            string propertiesStr;
-            if((propertyList == null) || !propertyList.Any())
-                propertiesStr =  null;
-            else
-                propertiesStr = string.Format(CultureInfo.InvariantCulture, "=.proplist=" + string.Join(",", propertyList.ToArray()));
-
-            //return Query(entity, new Dictionary<string, string>());
-            string command = string.Format(CultureInfo.InvariantCulture, "{0}/print\n=detail=", entityPath);
-            if (!string.IsNullOrEmpty(propertiesStr))
-                command += "\n" + propertiesStr;
-            if (!string.IsNullOrEmpty(filterStr))
-                command += "\n" + filterStr;
-
-            //if (filter.Count > 0)
-            //    command += "\n" + string.Join("\n", filter.Select(p => string.Format(".{0}={1}", p.Key, p.Value)).ToArray()); //TODO escape?
-
-            WriteMultilineCommand(command);
-            List<string> response = ReadResponse();
-
-
-            if (response[0].StartsWith("!trap", StringComparison.OrdinalIgnoreCase))
-                throw new TikConnectorException("API error: {0}", string.Join("\n", response.ToArray()));
-
-            if (response[response.Count - 1] != "!done")
-                throw new TikConnectorException("Unknown response format in Query.\n{0}", string.Join("\n", response.ToArray()));
+            List<string> response = ExecuteAndReadResponse(command, parameters, false, null, doneRegex, dataRowRegex);
 
             List<ApiEntityRow> result = new List<ApiEntityRow>(response.Count - 1);
             for (int i = 0; i < response.Count - 1; i++)
@@ -273,13 +247,136 @@ namespace Tik4Net.Connector.Api
             return result;
         }
 
-        private void WriteMultilineCommand(string command)
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteCreate"/> for details.
+        /// </summary>
+        public string ExecuteCreate(string entityPath, Dictionary<string, string> values)
+        {
+            //ip/address/add
+            //=address=192.168.88.1/24
+            //>!done
+            //>=ret=...ID...
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNull(values, "values");
+
+            if (values.Count <= 0)
+                throw new ArgumentException("No specified values in ExecuteCreate.", "values");
+
+            Dictionary<string, string> parameters = new Dictionary<string, string>(values.Count);
+            foreach (KeyValuePair<string, string> valPair in values) //values
+                parameters.Add("=" + valPair.Key, valPair.Value);
+
+            string command = entityPath + "/add";
+            string result = ExecuteAndReadResponse(command, parameters, createResponseRegex);
+
+            return createResponseRegex.Match(result).Groups["ID"].Value; //performace - createResponseRegex is validated twice
+        }
+
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteSet"/> for details.
+        /// </summary>
+        public void ExecuteSet(string entityPath, string id, Dictionary<string, string> values)
+        {
+            //ip/address/set
+            //=.id=...ID...
+            //=address=10.10.10.10
+            //>!done
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNullOrEmptyString(id, "id");
+            Guard.ArgumentNotNull(values, "values");
+
+            if (values.Count <= 0)
+                throw new ArgumentException("No specified values in ExecuteSet.", "values");
+
+            string command = entityPath + "/set";
+            Dictionary<string, string> parameters = new Dictionary<string,string>(values.Count);
+            parameters.Add("=.id", id); //id            
+            foreach (KeyValuePair<string, string> valPair in values) //values
+                parameters.Add("=" + valPair.Key, valPair.Value);
+
+            ExecuteNonQuery(command, parameters);
+        }
+
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteUnset"/> for details.
+        /// </summary>
+        public void ExecuteUnset(string entityPath, string id, List<string> properties)
+        {
+            //ip/address/unset
+            //=.id=...ID...
+            //=address=
+            //>!done
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNullOrEmptyString(id, "id");
+            Guard.ArgumentNotNull(properties, "properties");
+
+            if (properties.Count <= 0)
+                throw new ArgumentException("No specified properties in ExecuteUnset.", "properties");
+
+            string command = entityPath + "/unset";
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("=.id", id); //id            
+            foreach (string propName in properties) //values
+                parameters.Add("=" + propName, "");
+
+            ExecuteNonQuery(command, parameters);
+        }
+
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteDelete"/> for details.
+        /// </summary>
+        public void ExecuteDelete(string entityPath, string id)
+        {
+            //ip/address/remove
+            //=.id=...ID...
+            //>!done
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNullOrEmptyString(id, "id");
+
+            string command = entityPath + "/remove";
+            Dictionary<string, string> parameters = new Dictionary<string, string> 
+                { 
+                    { "=.id", id } 
+                };
+
+            ExecuteNonQuery(command, parameters);
+        }
+
+        /// <summary>
+        /// See <see cref="ITikConnector.ExecuteMove"/> for details.
+        /// </summary>
+        public void ExecuteMove(string entityPath, string idToMove, string idToMoveBefore)
+        {
+            //this will move queue witdh ID before queue with ID2 - http://forum.mikrotik.com/viewtopic.php?f=9&t=29390
+            // /queue/simple/move
+            // =numbers=...ID...
+            // =destination=...ID2...
+            // >!done
+
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNullOrEmptyString(idToMove, "idToMove");
+            Guard.ArgumentNotNullOrEmptyString(idToMoveBefore, "idToMoveBefore");
+
+            string command = entityPath + "/move"; 
+            Dictionary<string, string> parameters = new Dictionary<string, string>
+                {
+                    { "=numbers", idToMove },
+                    { "=destination", idToMoveBefore }
+                };
+
+            ExecuteNonQuery(command, parameters);
+        }
+
+
+        #endregion
+
+        private void WriteCommand(string command)
         {
             string[] lines = command.Split('\n');
             foreach (string line in lines)
             {
                 byte[] bytes = Encoding.ASCII.GetBytes(line.ToCharArray());
-                byte[] length = EncodeLength(bytes.Length);
+                byte[] length = ApiConnectorHelper.EncodeLength(bytes.Length);
 
                 connectionStream.Write(length, 0, length.Length);
                 connectionStream.Write(bytes, 0, bytes.Length);
@@ -288,68 +385,11 @@ namespace Tik4Net.Connector.Api
             connectionStream.WriteByte(0); //final byte
         }
 
-        private void WriteCommand(string command)
-        {
-            //TODO verify not contains \n
-            WriteMultilineCommand(command);
-        }
-
-        private static byte[] EncodeLength(int length)
-        {
-            if (length < 0x80)
-            {
-                byte[] tmp = BitConverter.GetBytes(length);
-                return new byte[1] { tmp[0] };
-            }
-            if (length < 0x4000)
-            {
-                byte[] tmp = BitConverter.GetBytes(length | 0x8000);
-                return new byte[2] { tmp[1], tmp[0] };
-            }
-            if (length < 0x200000)
-            {
-                byte[] tmp = BitConverter.GetBytes(length | 0xC00000);
-                return new byte[3] { tmp[2], tmp[1], tmp[0] };
-            }
-            if (length < 0x10000000)
-            {
-                byte[] tmp = BitConverter.GetBytes((uint)length | 0xE0000000);
-                return new byte[4] { tmp[3], tmp[2], tmp[1], tmp[0] };
-            }
-            else
-            {
-                byte[] tmp = BitConverter.GetBytes(length);
-                return new byte[5] { 0xF0, tmp[3], tmp[2], tmp[1], tmp[0] };
-            }
-        }
-
-        private static string EncodePassword(string password, string hash)
-        {
-            byte[] hash_byte = new byte[hash.Length / 2];
-            for (int i = 0; i <= hash.Length - 2; i += 2)
-            {
-                hash_byte[i / 2] = Byte.Parse(hash.Substring(i, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            }
-            byte[] heslo = new byte[1 + password.Length + hash_byte.Length];
-            heslo[0] = 0;
-            Encoding.ASCII.GetBytes(password.ToCharArray()).CopyTo(heslo, 1);
-            hash_byte.CopyTo(heslo, 1 + password.Length);
-
-            Byte[] hotovo;
-            System.Security.Cryptography.MD5 md5;
-
-            md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-
-            hotovo = md5.ComputeHash(heslo);
-
-            //Convert encoded bytes back to a 'readable' string
-            string result = "";
-            foreach (byte h in hotovo)
-            {
-                result += h.ToString("x2", CultureInfo.InvariantCulture);
-            }
-            return result;
-        }
+        //private void WriteCommand(string command)
+        //{
+        //    //TODO verify not contains \n
+        //    WriteMultilineCommand(command);
+        //}
 
         private List<string> ReadResponse()
         {
@@ -435,6 +475,7 @@ namespace Tik4Net.Connector.Api
             }
             if (connectionStream.DataAvailable)
                 throw new TikConnectorException("Not all data read - propably you send more than one command in one request.");
+
             return output;
         }
 
@@ -444,8 +485,6 @@ namespace Tik4Net.Connector.Api
                 throw new TikConnectorException("Connection has not been opened.");
             //TODO verify logon
         }
-
-        //http://ayufan.eu/projects/rosapi/repository/entry/trunk/routeros.class.php
 
         #region IDisposable Members
 
