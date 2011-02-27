@@ -137,9 +137,9 @@ namespace Tik4Net
             TikEntityMetadata entityMetadata = TikEntityMetadata.Get(typeof(TEntity));
             IEnumerable<ITikEntityRow> response;
             if (filter != null)
-                response = session.Connector.QueryDataRows(entityMetadata.EntityPath, entityMetadata.PropertyNames, filter);
+                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.PropertyNames, filter);
             else
-                response = session.Connector.QueryDataRows(entityMetadata.EntityPath, entityMetadata.PropertyNames);
+                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.PropertyNames);
 
             VerifyResponseRows(response);
 
@@ -242,14 +242,24 @@ namespace Tik4Net
             {
                 TEntity entity = items[i];
                 if (entity.IsModified)
-                {
-                    Dictionary<string, string> values = entity.GetAllModifiedProperties();
+                {                    
+                    Dictionary<string, string> valuesToSet = new Dictionary<string, string>();
+                    List<string> propertiesToUnset = new List<string>();
+                    foreach(KeyValuePair<string, string> pair in entity.GetAllModifiedProperties())
+                    {
+                        if (pair.Value == null)
+                            propertiesToUnset.Add(pair.Key);
+                        else
+                            valuesToSet.Add(pair.Key, pair.Value);
+                    }
+                    
+                    if (valuesToSet.Count > 0)
+                        session.Connector.ExecuteSet(metadata.EntityPath, entity.Id, valuesToSet);
+                    if (propertiesToUnset.Count > 0)
+                        session.Connector.ExecuteUnset(metadata.EntityPath, entity.Id, propertiesToUnset);
 
-                    session.Connector.ExecuteUpdate(metadata.EntityPath, entity.Id, values);
                     TEntity newEntity = LoadItem(entity.Id);
                     items[i] = newEntity; //put saved&loaded entity into list instead of dirty old-one
-
-                    //TODO have to add support for unset command!!!
                 }
             }
         }
