@@ -23,6 +23,12 @@ namespace Tik4Net.Connector
     public interface ITikConnector
     {
         /// <summary>
+        /// Gets a value indicating whether is logged on (<see cref="Open(string, int, string, string)"/>).
+        /// </summary>
+        /// <value><c>true</c> if is logged on; otherwise, <c>false</c>.</value>
+        bool LoggedOn { get; }
+
+        /// <summary>
         /// Creates the <see cref="ITikConnector"/> implementation specific <see cref="ITikEntityRow"/>.
         /// (Factory method).
         /// </summary>
@@ -87,20 +93,7 @@ namespace Tik4Net.Connector
         /// Version of <see cref="ExecuteReader(string)"/> with list of properties to be read and list of proName-propValue filter pairs.
         /// </summary>
         IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
-
-        ///// <summary>
-        ///// Similar to <see cref="QueryDataRows"/> but constructs list of <typeparamref name="TEntity"/> 
-        ///// instances from data rows obtained by <see cref="QueryDataRows"/> call.
-        ///// </summary>
-        ///// <typeparam name="TEntity">The type of the entity (must be <see cref="ITikReadableEntity"/> and have to contains empty constructor).</typeparam>
-        ///// <returns>List of <typeparamref name="TEntity"/> instances from obtained data rows.</returns>
-        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        //IEnumerable<TEntity> Query<TEntity>() 
-        //    where TEntity: ITikReadableEntity, new();
         
-        //List<IEntityRow> Query(string entity, Dictionary<string, string> filter)
-        //    where TEntity: IReadableEntity, new(); //TODO
-
         /// <summary>
         /// Executes creation command for entity with given values.
         /// </summary>
@@ -140,11 +133,17 @@ namespace Tik4Net.Connector
         /// <param name="entityPath">The entity (in x/y/z API notation).</param>
         /// <param name="idToMove">The id of entity to move.</param>
         /// <param name="idToMoveBefore">
-        /// The id of entity BEFORE which is <paramref name="idToMove"/> entity moved. If is null than 
-        /// given entity with <paramref name="idToMove"/> is moved to the end of list.
+        /// The id of entity BEFORE which is <paramref name="idToMove"/> entity moved. 
         /// </param>
         /// <remarks>Make sense only for <see cref="TikListMode.Ordered"/> lists of entities.</remarks>
+        /// <seealso cref="ExecuteMoveToEnd"/>
         void ExecuteMove(string entityPath, string idToMove, string idToMoveBefore);
+
+        /// <summary>
+        /// The same as <see cref="ExecuteMove"/> but moves given <paramref name="idToMove"/> to the end of list.
+        /// </summary>
+        /// <seealso cref="ExecuteMove"/>
+        void ExecuteMoveToEnd(string entityPath, string idToMove);
     }
 
     //ROUTEROS.CLASS

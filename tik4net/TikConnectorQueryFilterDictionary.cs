@@ -12,5 +12,6 @@ namespace Tik4Net
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
     public class TikConnectorQueryFilterDictionary: Dictionary<string, string>
     {
+        //TODO redesign to hold (property + value + operator)
     }
 }

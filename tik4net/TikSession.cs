@@ -74,6 +74,15 @@ namespace Tik4Net
         }
 
         /// <summary>
+        /// Gets a value indicating whether is logged on (<see cref="Open(string, int, string, string)"/>).
+        /// </summary>
+        /// <value><c>true</c> if is logged on; otherwise, <c>false</c>.</value>
+        public bool LoggedOn
+        {
+            get { return connector.LoggedOn; }
+        }
+
+        /// <summary>
         /// Gets the type of the <see cref="Connector"/> - predefined type or  <see cref="TikConnectorType.Custom"/>.
         /// </summary>
         /// <value>The type of the connector.</value>
@@ -150,42 +159,6 @@ namespace Tik4Net
         {
             connector.Open(host, port, user, password);
         }
-
-        //#region -- SAVE --
-        //public void Save<TList>(TList list)
-        //    where TList : ITikList, new()     
-        //{
-        //    //TODO VERIFY - http://www.ispforum.cz/viewtopic.php?f=3&t=4514
-        //    SaveInternal<TList>(list);
-        //}        
-
-        //private void SaveInternal<TList>(TList list)
-        //      where TList : ITikList, new()
-        //{
-        //    //TODO verify the same filter!!!
-        //    TList refList = FetchAll<TList>();
-
-        //    ListMergeHelper<ITikEntity> mergeHelper = new ListMergeHelper<ITikEntity>(
-        //        SaveInsertItem, SaveUpdateItem, SaveDeleteItem);
-        //    mergeHelper.Merge(list.GetEnumerator(), refList.GetEnumerator());           
-        //}
-
-        //private static void SaveInsertItem(object sender, ITikEntity sourceItem)
-        //{
-        //    Console.WriteLine("Add {0}", sourceItem);
-        //}
-
-        //private static void SaveDeleteItem(object sender, ITikEntity destinationItem)
-        //{
-        //    Console.WriteLine("Delete {0}", destinationItem);
-        //}
-
-        //private static void SaveUpdateItem(object sender, ITikEntity sourceItem, ITikEntity destinationItem)
-        //{
-        //    Console.WriteLine("Update {0} -> {1}", destinationItem, sourceItem);
-        //}
-
-        //#endregion
 
         #region IDisposable Members
 

@@ -64,7 +64,7 @@ namespace Tik4Net
         protected virtual void Clear()
         {
             items.Clear();
-            //TODO Clear changes
+            //TODO Clear changes?
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Tik4Net
             if (loadedItems.Count > 1)
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "More than one item with id {0} returned in {1}.", id, GetType()));
             else if (loadedItems.Count == 0)
-                return null; //TODO or exception?
+                return null; 
             else
                 return loadedItems[0];
         }

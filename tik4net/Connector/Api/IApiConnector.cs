@@ -16,5 +16,13 @@ namespace Tik4Net.Connector.Api
         /// </summary>
         /// <param name="command">The command string in API format (use \n to split rows).</param>
         void ExecuteNonQuery(string command);
+
+        /// <summary>
+        /// Executes the specified command.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <returns>Command response</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        List<string> Execute(string command);
     }
 }

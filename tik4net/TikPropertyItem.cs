@@ -90,20 +90,6 @@ namespace Tik4Net
             return (string)itemValue;
         }
 
-        //public string GetStringRepresentation()
-        //{
-        //    if (HasValue)
-        //    {
-        //        //TODO handle true/false vs. yes/no in boolean
-        //        if (itemValue is bool?)
-        //            return ((bool?)itemValue).Value ? "yes" : "no";
-        //        else
-        //            return itemValue.ToString();
-        //    }
-        //    else
-        //        return string.Empty;
-        //}
-
         public bool IsDataEqual(TikPropertyItem item)
         {
             return object.Equals(item.itemValue, itemValue);
