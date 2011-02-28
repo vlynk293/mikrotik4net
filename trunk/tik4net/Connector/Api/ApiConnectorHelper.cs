@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using Tik4Net.Objects;
 
 namespace Tik4Net.Connector.Api
 {
@@ -63,6 +64,23 @@ namespace Tik4Net.Connector.Api
                 result += h.ToString("x2", CultureInfo.InvariantCulture);
             }
             return result;
+        }
+
+        internal static string LogLevelToCommandSufix(LogLevel level)
+        {
+            switch(level)
+            {
+                case LogLevel.Debug:
+                    return "debug";
+                case LogLevel.Info:
+                    return "info";
+                case LogLevel.Warning:
+                    return "warning";
+                case LogLevel.Error:
+                    return "error";
+                default:
+                    throw new NotImplementedException(string.Format(CultureInfo.CurrentCulture, "LogLevel '{0}' not supported.", level));
+            }
         }
     }
 }

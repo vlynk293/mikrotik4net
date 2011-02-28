@@ -186,6 +186,42 @@ namespace Tik4Net
             connector.Open(host, port, user, password);
         }
 
+        /// <summary>
+        /// Calls <see cref="CastConnector{TConnector}()"/> with <see cref="ActiveSession"/>.<see cref="TikSession.Connector">Connector</see>.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public static TConnector CastActiveConnector<TConnector>()
+            where TConnector : class, ITikConnector
+        {
+            return CastConnector<TConnector>(ActiveSession.Connector);
+        }
+
+        /// <summary>
+        /// Casts the <see cref="Connector"/> as given <typeparamref name="TConnector"/>.
+        /// Throws exception if cast is not posible.
+        /// </summary>
+        /// <typeparam name="TConnector">The type to which connector should be casted.</typeparam>
+        /// <returns>Casted connector.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public TConnector CastConnector<TConnector>()
+            where TConnector : class, ITikConnector
+        {
+            return CastConnector<TConnector>(connector);
+        }
+
+        private static TConnector CastConnector<TConnector>(ITikConnector connector)
+            where TConnector : class, ITikConnector
+        {
+            Guard.ArgumentNotNull(connector, "connector");
+
+            TConnector castedConnector = connector as TConnector;
+            if (castedConnector == null)
+                throw new TikConnectorException(string.Format(CultureInfo.CurrentCulture, "Connector '{0}' does't implement '{1}'.", connector.GetType(), typeof(TConnector)));
+            else
+                return castedConnector;
+        }
+
+
         #region IDisposable Members
 
         /// <summary>

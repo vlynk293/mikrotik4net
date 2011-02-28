@@ -395,7 +395,24 @@ namespace Tik4Net.Connector.Api
 
         public List<string> Execute(string command)
         {
-            return ExecuteAndReadResponse(command, null, false, null, null, null);
+            WriteCommand(command);
+            List<string> result = ReadResponse();
+            return result;
+            //return ExecuteAndReadResponse(command, null, false, null, null, null); - we don't need converting !trap to exception
+        }
+
+        #endregion
+
+        #region ILogConnector Members
+
+        public void Log(string message, Tik4Net.Objects.LogLevel level)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string,string>()
+                {
+                    { "=message", message }
+                };
+            string command = "/log/" + ApiConnectorHelper.LogLevelToCommandSufix(level);
+            ExecuteNonQuery(command, parameters);
         }
 
         #endregion
@@ -521,6 +538,5 @@ namespace Tik4Net.Connector.Api
             if (!loggedOn || (connection == null) || (connectionStream == null))
                 throw new TikConnectorException("Connection has not been opened.");
         }
-
     }
 }
