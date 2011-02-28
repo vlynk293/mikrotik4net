@@ -44,8 +44,10 @@ namespace Tik4Net
         [ThreadStatic]
         private static Stack<TikSession> activeSessions = new Stack<TikSession>();
 
+        private readonly object lockObject = new object();
         private readonly ITikConnector connector;
         private readonly TikConnectorType connectorType;
+        private Tik4Net.Objects.System.SystemResource tikRouter;
 
         /// <summary>
         /// Gets the active session (lastly created instance of <see cref="TikSession"/>) in current thread.
@@ -59,6 +61,30 @@ namespace Tik4Net
                     return activeSessions.Peek();
                 else
                     return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the tik router state - instance of <see cref="Tik4Net.Objects.System.SystemResource"/>
+        /// class that describes router state.
+        /// </summary>
+        /// <value>The tik router describing object.</value>
+        /// <remarks>
+        /// Is cached per session - if you need actual router state (e.g. for CPU load examination),
+        /// you could use <see cref="Tik4Net.Objects.System.SystemResource.LoadInstance"/> direct call.
+        /// </remarks>
+        public Tik4Net.Objects.System.SystemResource TikRouter
+        {
+            get
+            {
+                lock(lockObject)
+                {
+                    if (tikRouter == null)
+                    {
+                        tikRouter = Tik4Net.Objects.System.SystemResource.LoadInstance();
+                    }
+                    return tikRouter;
+                }
             }
         }
 
