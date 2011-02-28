@@ -10,7 +10,16 @@ namespace Tik4Net.Objects.System
     /// </summary>
     public sealed partial class SystemResource: TikEntityBase
     {
-        
+        /// <summary>
+        /// Loads the single instance of <see cref="SystemResource"/> (router description and state).
+        /// </summary>
+        /// <returns>Single instance of <see cref="SystemResource"/> (router description and state)</returns>
+        public static SystemResource LoadInstance()
+        {
+            SystemResourceList list = new SystemResourceList();
+            list.LoadAll();
+            return list.First();
+        }
     }
 
     /// <summary>
@@ -18,6 +27,5 @@ namespace Tik4Net.Objects.System
     /// </summary>    
     public sealed partial class SystemResourceList //: TikSingleRowList<SystemResource>
     {
-		//TODO Custom LOAD methods to match filtering needs
     }           
 }
