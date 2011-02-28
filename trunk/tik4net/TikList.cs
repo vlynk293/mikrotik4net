@@ -62,11 +62,14 @@ namespace Tik4Net
         /// to enable perform this move during <see cref="TikListBase{TEntity}.Save"/> process.
         /// </para>
         /// </summary>
+        /// <remarks>
+        /// Entity is moved maximally once - if you move entity more than once, only last move is performed.
+        /// It can produce some strange behavior if you move entity B somewhere, than move entity A before B and than move entity B somewhere else.
+        /// </remarks>
         /// <param name="entityToMove">The entity to move.</param>
         /// <param name="entityToMoveBefore">The entity before which is given <paramref name="entityToMove"/> moved.</param>
         public void Move(TEntity entityToMove, TEntity entityToMoveBefore)
         {
-            //TODO remove moved entity from list of moves
             //TODO ensure entity not deleted, etc ...
             //TODO what about newly created entities?
 
@@ -80,8 +83,9 @@ namespace Tik4Net
             //move in list
             Items.Remove(entityToMove);
             Items.Insert(entityToMoveBeforeIdx, entityToMove);
-            //remember move
-            entityMoves.Add(entityToMove, entityToMoveBefore);
+
+            //remember move (insert or update)
+            entityMoves[entityToMove] =  entityToMoveBefore;
         }
 
         /// <summary>
@@ -124,7 +128,7 @@ namespace Tik4Net
                 if (pair.Value != null)
                     session.Connector.ExecuteMove(metadata.EntityPath, pair.Key.Id, pair.Value.Id);
                 else
-                    throw new NotImplementedException();//TODO session.Connector.ExecuteMoveToEnd(metadata.EntityPath, pair.Key.Id);
+                    session.Connector.ExecuteMoveToEnd(metadata.EntityPath, pair.Key.Id);
             }
             entityMoves.Clear();
         }

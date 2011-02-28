@@ -26,9 +26,14 @@ namespace Tik4Net.Connector.Api
         private static Regex closeResponseRegex = new Regex(@"^!fatal\s*session terminated on request");
         private TcpClient connection;
         private NetworkStream connectionStream;
-        private bool logged = false;
+        private bool loggedOn = false;
 
         #region ITikConnector Members
+
+        public bool LoggedOn
+        {
+            get { return loggedOn; }
+        }
 
         public void Open(string host, string user, string password)
         {
@@ -37,7 +42,7 @@ namespace Tik4Net.Connector.Api
 
         public void Open(string host, int port, string user, string password)
         {
-            if (logged)
+            if (loggedOn)
                 throw new TikConnectorException("Already logged in");
             //open connection
             connection = new TcpClient();
@@ -54,13 +59,13 @@ namespace Tik4Net.Connector.Api
                     {"=response", "00" + hashedPass}
                 }); 
 
-            logged = true;
+            loggedOn = true;
         }
 
         public void Close()
         {
             //logoff
-            if (logged)
+            if (loggedOn)
             {
                 string command = "/quit"; //Does not work in 3.x (see links)
                 WriteCommand(command); 
@@ -79,7 +84,7 @@ namespace Tik4Net.Connector.Api
             if (connection != null)
                 connection.Close();
 
-            logged = false;
+            loggedOn = false;
         }
 
         public ITikEntityRow CreateEntityRow(string entityRowData)
@@ -124,11 +129,6 @@ namespace Tik4Net.Connector.Api
             ExecuteAndReadResponse(command, parameters, true, doneRegex, null, null);
         }
 
-        public void ExecuteNonQuery(string command)
-        {
-            ExecuteNonQuery(command, null);
-        }
-
         private static void ValidateResponseRows(string command, List<string> response, bool exactlyOneRow,
             Regex firstRowRegex, Regex lastRowRegex, Regex otherRowRegex)
         {
@@ -144,7 +144,7 @@ namespace Tik4Net.Connector.Api
                     errors.Add(trapMatch.Groups["ERROR"].Value);                
             }
             if (errors.Count > 0)
-                throw new TikConnectorException("Target returns error.", command, errors, response); //TODO
+                throw new TikConnectorException("Target returns error.", command, errors, response); 
 
             //verify response row count
             if (exactlyOneRow && (response.Count != 1))
@@ -232,7 +232,6 @@ namespace Tik4Net.Connector.Api
                 foreach(KeyValuePair<string, string> fltPair in filter)
                 {
                     parameters.Add("?" + fltPair.Key, fltPair.Value); //TODO - convert from internal expression!!!
-#warning Not final code!
                 }
             }
 
@@ -352,7 +351,6 @@ namespace Tik4Net.Connector.Api
             // =numbers=...ID...
             // =destination=...ID2...
             // >!done
-
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
             Guard.ArgumentNotNullOrEmptyString(idToMove, "idToMove");
             Guard.ArgumentNotNullOrEmptyString(idToMoveBefore, "idToMoveBefore");
@@ -367,6 +365,51 @@ namespace Tik4Net.Connector.Api
             ExecuteNonQuery(command, parameters);
         }
 
+        public void ExecuteMoveToEnd(string entityPath, string idToMove)
+        {
+
+            //this will move queue witdh ID to the end - http://forum.mikrotik.com/viewtopic.php?f=9&t=29390
+            // /queue/simple/move
+            // =.id=...ID...
+            // >!done
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            Guard.ArgumentNotNullOrEmptyString(idToMove, "idToMove");
+
+            string command = entityPath + "/move";
+            Dictionary<string, string> parameters = new Dictionary<string, string>
+                {
+                    { ".id", idToMove },
+                };
+
+            ExecuteNonQuery(command, parameters);
+        }
+
+        #endregion
+
+        #region IApiConnector Members
+
+        public void ExecuteNonQuery(string command)
+        {
+            ExecuteNonQuery(command, null);
+        }
+
+        public List<string> Execute(string command)
+        {
+            return ExecuteAndReadResponse(command, null, false, null, null, null);
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Calls <see cref="Close"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Close();
+        }
 
         #endregion
 
@@ -384,12 +427,6 @@ namespace Tik4Net.Connector.Api
 
             connectionStream.WriteByte(0); //final byte
         }
-
-        //private void WriteCommand(string command)
-        //{
-        //    //TODO verify not contains \n
-        //    WriteMultilineCommand(command);
-        //}
 
         private List<string> ReadResponse()
         {
@@ -481,22 +518,9 @@ namespace Tik4Net.Connector.Api
 
         private void EnsureLoggedOn()
         {
-            if ((connection == null) || (connectionStream == null))
+            if (!loggedOn || (connection == null) || (connectionStream == null))
                 throw new TikConnectorException("Connection has not been opened.");
-            //TODO verify logon
         }
 
-        #region IDisposable Members
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// Calls <see cref="Close"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Close();
-        }
-
-        #endregion
     }
 }
