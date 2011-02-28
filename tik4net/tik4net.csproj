@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
     <Compile Include="Connector\Api\IApiConnector.cs" />
+    <Compile Include="Connector\ILogConnector.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
       <DependentUpon>FirewallAddressList.cs</DependentUpon>
@@ -105,6 +106,7 @@
     <Compile Include="Objects\Log.designer.cs">
       <DependentUpon>Log.cs</DependentUpon>
     </Compile>
+    <Compile Include="Objects\LogLevel.cs" />
     <Compile Include="Objects\Queue\QueueTree.cs" />
     <Compile Include="Objects\Queue\QueueTree.designer.cs">
       <DependentUpon>QueueTree.cs</DependentUpon>
