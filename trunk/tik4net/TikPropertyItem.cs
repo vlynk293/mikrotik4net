@@ -94,5 +94,10 @@ namespace Tik4Net
         {
             return object.Equals(item.itemValue, itemValue);
         }
+
+        public override string ToString()
+        {
+            return itemValue == null ? "null" : itemValue.ToString();
+        }
     }
 }

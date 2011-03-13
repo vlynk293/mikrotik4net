@@ -210,5 +210,25 @@ namespace Tik4Net
             //assign property values
             properties = entity.Properties; //not very clear ... copy of values could be better solution!
         }
+
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String"/> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            List<string> modificators = new List<string>();
+            if (IsMarkedDeleted)
+                modificators.Add("D");
+            if (IsMarkedNew)
+                modificators.Add("I");
+            string modificator = string.Join(",", modificators.ToArray());
+            if (!string.IsNullOrEmpty(modificator))
+                modificator = "[" + modificator + "]";
+
+            return string.Format(CultureInfo.CurrentCulture, "{0}{1}: {2}", GetType().Name, modificator, Properties.ToString());
+        }
     }
 }

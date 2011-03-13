@@ -32,5 +32,55 @@ namespace Tik4Net
             : base(session)
         {
         }
+
+        private static bool EntityKeyEqual(TEntity e1, TEntity e2, Func<TEntity, object> keyExtractor)
+        {
+            return object.Equals(keyExtractor(e1), keyExtractor(e2));
+        }
+
+        /// <summary>
+        /// Merges the <paramref name="data"/> into given <paramref name="subset"/> (part of this list).
+        /// <para>New items from <paramref name="data"/> are added into this list</para>
+        /// <para>items that are in <paramref name="subset"/> but are missing in data are <see cref="TikEntityBase.MarkDeleted"/>.</para> 
+        /// <para>Items with the same key (<paramref name="keyExtractor"/>) are updated by <paramref name="updateDataAction"/>.</para>
+        /// <example>
+        /// //update mikrotik router to state in database
+        /// listInMikrotik = LoadListFromMikrotik();
+        /// listInDb = LoadListFromMikrotik();
+        /// //merge the whole list
+        /// listInMikrotik.MergeSubset(listInMikrotik, listInDb, i =&gt; i.Id, (dst, src) => { dst.Name = src.Name; dst.Priority = src.Priority; } );
+        /// listInMikrotik.Save();
+        /// </example>
+        /// </summary>
+        /// <param name="subset">The subset in this list (the same filter as in <paramref name="data"/>).</param>
+        /// <param name="data">The data to be metged into this list.</param>
+        /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
+        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
+        /// <remarks><see cref="TikUnorderedList{TEntity}"/> is not ordered -} method doesn't care about order of items.</remarks>
+        public void MergeSubset(IEnumerable<TEntity> subset, IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
+        {
+            Guard.ArgumentNotNull(subset, "subset");
+            Guard.ArgumentNotNull(data, "data");
+            Guard.ArgumentNotNull(keyExtractor, "keyExtractor");
+            Guard.ArgumentNotNull(updateDataAction, "updateDataAction");
+
+            List<TEntity> subsetList = subset.ToList();
+            List<TEntity> dataList = data.ToList();
+
+            foreach (TEntity subsetEntity in subsetList)
+                subsetEntity.MarkDeleted(); //will be cleared if found in dataList
+
+            foreach (TEntity dataEntity in dataList)
+            {
+                TEntity subsetEntity = subsetList.FirstOrDefault(e => EntityKeyEqual(e, dataEntity, keyExtractor));
+                if (subsetEntity != null)
+                {
+                    updateDataAction(subsetEntity, dataEntity);
+                    subsetEntity.MarkClear();
+                }
+                else
+                    Add(dataEntity);
+            }
+        }
     }
 }

@@ -36,6 +36,26 @@ namespace Tik4Net
         }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is modified (any item in list is <see cref="TikEntityBase.IsModified"/>).
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is modified; otherwise, <c>false</c>.
+        /// </value>
+        public virtual bool IsModified
+        {
+            get
+            {
+                foreach (TEntity item in items)
+                {
+                    if (item.IsModified)
+                        return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TikListBase&lt;TEntity&gt;"/> class with <see cref="TikSession.ActiveSession"/> session.
         /// </summary>
         protected TikListBase()

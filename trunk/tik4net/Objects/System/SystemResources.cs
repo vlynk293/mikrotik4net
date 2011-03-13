@@ -27,5 +27,12 @@ namespace Tik4Net.Objects.System
     /// </summary>    
     public sealed partial class SystemResourceList //: TikSingleRowList<SystemResource>
     {
+        /// <summary>
+        /// See <see cref="SystemResource.LoadInstance"/> for details.
+        /// </summary>
+        public static SystemResource LoadInstance()
+        {
+            return SystemResource.LoadInstance();
+        }
     }           
 }

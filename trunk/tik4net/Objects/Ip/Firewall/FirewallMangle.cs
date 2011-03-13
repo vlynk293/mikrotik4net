@@ -10,7 +10,6 @@ namespace Tik4Net.Objects.Ip.Firewall
     /// </summary>
     public sealed partial class FirewallMangle: TikEntityBase
     {
-        
     }
 
     /// <summary>
