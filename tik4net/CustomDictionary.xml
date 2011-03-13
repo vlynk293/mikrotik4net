@@ -23,7 +23,9 @@
   <Acronyms>
     <CasingExceptions>
       <Acronym>Tik</Acronym>
-      <Acronym>Ip</Acronym>      
+      <Acronym>Ip</Acronym>
+      <Acronym>Src</Acronym>
+      <Acronym>Dst</Acronym>
     </CasingExceptions>
   </Acronyms>
 </Dictionary>

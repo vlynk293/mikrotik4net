@@ -98,18 +98,34 @@
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
       <DependentUpon>FirewallAddressList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallFilter.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallFilter.designer.cs">
+      <DependentUpon>FirewallFilter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Objects\Ip\Firewall\FirewallMangle.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallMangle.designer.cs">
       <DependentUpon>FirewallMangle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallNat.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallNat.designer.cs">
+      <DependentUpon>FirewallNat.cs</DependentUpon>
     </Compile>
     <Compile Include="Objects\Log.cs" />
     <Compile Include="Objects\Log.designer.cs">
       <DependentUpon>Log.cs</DependentUpon>
     </Compile>
     <Compile Include="Objects\LogLevel.cs" />
+    <Compile Include="Objects\Queue\QueueSimple.cs" />
+    <Compile Include="Objects\Queue\QueueSimple.designer.cs">
+      <DependentUpon>QueueSimple.cs</DependentUpon>
+    </Compile>
     <Compile Include="Objects\Queue\QueueTree.cs" />
     <Compile Include="Objects\Queue\QueueTree.designer.cs">
       <DependentUpon>QueueTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Queue\QueueType.cs" />
+    <Compile Include="Objects\Queue\QueueType.designer.cs">
+      <DependentUpon>QueueType.cs</DependentUpon>
     </Compile>
     <Compile Include="Objects\System\SystemResources.cs" />
     <Compile Include="Objects\System\SystemResources.designer.cs">
