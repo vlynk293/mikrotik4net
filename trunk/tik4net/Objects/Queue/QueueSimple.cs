@@ -6,17 +6,17 @@ using System.Text;
 namespace Tik4Net.Objects.Queue
 {   
     /// <summary>
-    /// Represents one row in /queue/tree on mikrotik router.
+    /// Represents one row in /queue/simple on mikrotik router.
     /// </summary>
-    public sealed partial class QueueTree: TikEntityBase
+    public sealed partial class QueueSimple: TikEntityBase
     {
         
     }
 
     /// <summary>
-    /// Represents list of rows in /queue/tree on mikrotik router - CUSTOM CODE.
+    /// Represents list of rows in /queue/simple on mikrotik router - CUSTOM CODE.
     /// </summary>    
-    public sealed partial class QueueTreeList //: TikUnorderedList<QueueTree>
+    public sealed partial class QueueSimpleList //: TikUnorderedList<QueueSimple>
     {
 		//TODO Custom LOAD methods to match filtering needs
     }           

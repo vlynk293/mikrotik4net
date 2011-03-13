@@ -8,28 +8,26 @@ using System.Text;
 
 /*
 !re
-=.id=*338
-=chain=prerouting
-=action=mark-routing
-=new-routing-mark=NEPLATIC
-=passthrough=true
-=protocol=tcp
-=src-address=10.43.0.0/16
-=dst-address=!10.0.0.0/8
-=src-address-list=NEPLATIC
-=dst-port=80
+=.id=*A6
+=chain=dstnat
+=action=dst-nat
+=to-addresses=10.43.94.1
+=to-ports=53
+=protocol=udp
+=dst-address=10.43.96.50
+=dst-port=53
 =invalid=false
 =dynamic=false
 =disabled=false
-=comment=NEPLATIC - Obcasne presmerovani neplaticu na 10.43.94.200:5000 (d:\WWW\neplatic)
+=comment=Temporary forward 10.43.96.50 DNS to 10.43.94.1 (Danik)
 */
 namespace Tik4Net.Objects.Ip.Firewall
 {
     /// <summary>
-    /// Represents one row in /ip/firewall/mangle on mikrotik router.
+    /// Represents one row in /ip/firewall/nat on mikrotik router.
     /// </summary>
-    [TikEntity("/ip/firewall/mangle", TikEntityEditMode.Editable)]    
-    public sealed partial class FirewallMangle: TikEntityBase
+    [TikEntity("/ip/firewall/nat", TikEntityEditMode.Editable)]    
+    public sealed partial class FirewallNat: TikEntityBase
     {
         /// <summary>
         /// Row action property.
@@ -40,26 +38,6 @@ namespace Tik4Net.Objects.Ip.Firewall
             get { return Properties.GetAsStringOrNull("action"); }
             set { Properties.SetAttribute("action", value); }
         }
-
-        /// <summary>
-        /// Row address-list property.
-        /// </summary>
-        [TikProperty("address-list", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string AddressList 
-        { 
-            get { return Properties.GetAsStringOrNull("address-list"); }
-            set { Properties.SetAttribute("address-list", value); }
-        }        	
-
-        /// <summary>
-        /// Row address-list-timeout property.
-        /// </summary>
-        [TikProperty("address-list-timeout", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string AddressListTimeout 
-        { 
-            get { return Properties.GetAsStringOrNull("address-list-timeout"); }
-            set { Properties.SetAttribute("address-list-timeout", value); }
-        }        	
 
         /// <summary>
         /// Row comment property.
@@ -102,12 +80,22 @@ namespace Tik4Net.Objects.Ip.Firewall
         }        	
 
         /// <summary>
+        /// Row dst-address-type property.
+        /// </summary>
+        [TikProperty("dst-address-type", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string DstAddressType 
+        { 
+            get { return Properties.GetAsStringOrNull("dst-address-type"); }
+            set { Properties.SetAttribute("dst-address-type", value); }
+        }        	
+
+        /// <summary>
         /// Row dst-port property.
         /// </summary>
-        [TikProperty("dst-port", typeof(long?), false, TikPropertyEditMode.Editable)]
-        public long? DstPort 
+        [TikProperty("dst-port", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string DstPort 
         { 
-            get { return Properties.GetAsInt64OrNull("dst-port"); }
+            get { return Properties.GetAsStringOrNull("dst-port"); }
             set { Properties.SetAttribute("dst-port", value); }
         }        	
 
@@ -144,41 +132,21 @@ namespace Tik4Net.Objects.Ip.Firewall
         /// <summary>
         /// Row invalid property.
         /// </summary>
-        [TikProperty("invalid", typeof(bool?), false, TikPropertyEditMode.Editable)]
+        [TikProperty("invalid", typeof(bool?), false, TikPropertyEditMode.ReadOnly)]
         public bool? Invalid 
         { 
             get { return Properties.GetAsBooleanOrNull("invalid"); }
-            set { Properties.SetAttribute("invalid", value); }
+            // Property R/O set { Properties.SetAttribute("invalid", value); }
         }        	
 
         /// <summary>
-        /// Row new-packet-mark property.
+        /// Row out-interface property.
         /// </summary>
-        [TikProperty("new-packet-mark", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string NewPacketMark 
+        [TikProperty("out-interface", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string OutInterface 
         { 
-            get { return Properties.GetAsStringOrNull("new-packet-mark"); }
-            set { Properties.SetAttribute("new-packet-mark", value); }
-        }        	
-
-        /// <summary>
-        /// Row new-routing-mark property.
-        /// </summary>
-        [TikProperty("new-routing-mark", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string NewRoutingMark 
-        { 
-            get { return Properties.GetAsStringOrNull("new-routing-mark"); }
-            set { Properties.SetAttribute("new-routing-mark", value); }
-        }        	
-
-        /// <summary>
-        /// Row passthrough property.
-        /// </summary>
-        [TikProperty("passthrough", typeof(bool?), false, TikPropertyEditMode.Editable)]
-        public bool? Passthrough 
-        { 
-            get { return Properties.GetAsBooleanOrNull("passthrough"); }
-            set { Properties.SetAttribute("passthrough", value); }
+            get { return Properties.GetAsStringOrNull("out-interface"); }
+            set { Properties.SetAttribute("out-interface", value); }
         }        	
 
         /// <summary>
@@ -222,46 +190,56 @@ namespace Tik4Net.Objects.Ip.Firewall
         }        	
 
         /// <summary>
-        /// Row tcp-flags property.
+        /// Row src-address-type property.
         /// </summary>
-        [TikProperty("tcp-flags", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string TcpFlags 
+        [TikProperty("src-address-type", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string SrcAddressType 
         { 
-            get { return Properties.GetAsStringOrNull("tcp-flags"); }
-            set { Properties.SetAttribute("tcp-flags", value); }
+            get { return Properties.GetAsStringOrNull("src-address-type"); }
+            set { Properties.SetAttribute("src-address-type", value); }
         }        	
 
         /// <summary>
-        /// Row jump-target property.
+        /// Row to-addresses property.
         /// </summary>
-        [TikProperty("jump-target", typeof(string), false, TikPropertyEditMode.Editable)]
-        public string JumpTarget 
+        [TikProperty("to-addresses", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string ToAddresses 
         { 
-            get { return Properties.GetAsStringOrNull("jump-target"); }
-            set { Properties.SetAttribute("jump-target", value); }
+            get { return Properties.GetAsStringOrNull("to-addresses"); }
+            set { Properties.SetAttribute("to-addresses", value); }
+        }        	
+
+        /// <summary>
+        /// Row to-ports property.
+        /// </summary>
+        [TikProperty("to-ports", typeof(string), false, TikPropertyEditMode.Editable)]
+        public string ToPorts 
+        { 
+            get { return Properties.GetAsStringOrNull("to-ports"); }
+            set { Properties.SetAttribute("to-ports", value); }
         }        	
     }
     
     /// <summary>
-    /// Represents list of rows in /ip/firewall/mangle on mikrotik router.
+    /// Represents list of rows in /ip/firewall/nat on mikrotik router.
     /// </summary>    
     [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]    
-    public sealed partial class FirewallMangleList : TikList<FirewallMangle>
+    public sealed partial class FirewallNatList : TikList<FirewallNat>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirewallMangleList"/> class.
+        /// Initializes a new instance of the <see cref="FirewallNatList"/> class.
         /// Default active session (<see cref="TikSession.ActiveSession"/> is used).
         /// </summary>
-        public FirewallMangleList() 
+        public FirewallNatList() 
             : base()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirewallMangleList"/> class.
+        /// Initializes a new instance of the <see cref="FirewallNatList"/> class.
         /// </summary>
         /// <param name="session">The session used to access mikrotik.</param>
-        public FirewallMangleList(TikSession session)
+        public FirewallNatList(TikSession session)
             : base(session)
         {
         }
