@@ -96,7 +96,7 @@ namespace Tik4Net.ApiGenerator
             tbConsoleOutput.AppendText(string.Join(Environment.NewLine, consoleLastCommand.Split('\n').Select(l => ">> " + l).ToArray()));
             tbConsoleOutput.AppendText(Environment.NewLine);
 
-            consoleLastResponse = ((IApiConnector)consoleSession.Connector).Execute(consoleLastCommand);
+            consoleLastResponse = ((IApiConnector)consoleSession.Connector).ApiExecute(consoleLastCommand);
 
             tbConsoleOutput.AppendText(string.Join(Environment.NewLine, consoleLastResponse.ToArray()));
             //tbConsoleInput.Text = "";

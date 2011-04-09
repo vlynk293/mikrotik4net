@@ -194,11 +194,14 @@ namespace Tik4Net.Connector.Api
         /// </summary>
         public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList)
         {
-            EnsureLoggedOn();
+            //Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            //EnsureLoggedOn();
 
-            List<ApiEntityRow> result = ExecuteReaderInternal(entityPath, propertyList, null);
+            //List<ITikEntityRow> result = ExecuteReaderInternal(string.Format(CultureInfo.InvariantCulture, "{0}/print", entityPath), 
+            //    propertyList, null, new Dictionary<string, string>{ { "=detail", "" } });
 
-            return result.Cast<ITikEntityRow>().ToList();
+            //return result;
+            return ExecuteReader(entityPath, propertyList, null);
         }
 
         /// <summary>
@@ -206,36 +209,45 @@ namespace Tik4Net.Connector.Api
         /// </summary>
         public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
         {
-            Guard.ArgumentNotNull(filter, "filter");
+            Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
+            //Guard.ArgumentNotNull(filter, "filter");
             EnsureLoggedOn();
 
-            List<ApiEntityRow> result = ExecuteReaderInternal(entityPath, propertyList, filter);
+            List<ITikEntityRow> result = ExecuteReaderInternal(string.Format(CultureInfo.InvariantCulture, "{0}/print", entityPath), 
+                propertyList, filter, new Dictionary<string, string>{ { "=detail", "" } });
 
-            return result.Cast<ITikEntityRow>().ToList();
+            return result;
         }
 
-        private List<ApiEntityRow> ExecuteReaderInternal(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
+        private List<ITikEntityRow> ExecuteReaderInternal(string command, IEnumerable<string> propertyList, 
+            TikConnectorQueryFilterDictionary filter, Dictionary<string, string> parameters)
         {
             // ip/address/print
             // =detail=
             // =.proplist=..,..,..,..
             // ?address=10.10.10.10
 
-            string command = string.Format(CultureInfo.InvariantCulture, "{0}/print", entityPath);
+            Dictionary<string, string> allParameters;
+            //parameters
+            if (parameters != null)
+                allParameters = new Dictionary<string,string>(parameters);
+            else
+                allParameters = new Dictionary<string, string>(); 
 
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters.Add("=detail", ""); //detail            
+            //propList
             if ((propertyList != null) && propertyList.Any()) //.proplist  (if specified)
-                parameters.Add("=.proplist", string.Join(",", propertyList.ToArray()));
+                allParameters.Add("=.proplist", string.Join(",", propertyList.ToArray()));
+
+            //filter
             if (filter != null) //filter (if specified)
             {
                 foreach(KeyValuePair<string, string> fltPair in filter)
                 {
-                    parameters.Add("?" + fltPair.Key, fltPair.Value); //TODO - convert from internal expression!!!
+                    allParameters.Add("?" + fltPair.Key, fltPair.Value); //TODO - convert from internal expression!!!
                 }
             }
 
-            List<string> response = ExecuteAndReadResponse(command, parameters, false, null, doneRegex, dataRowRegex);
+            List<string> response = ExecuteAndReadResponse(command, allParameters, false, null, doneRegex, dataRowRegex);
 
             List<ApiEntityRow> result = new List<ApiEntityRow>(response.Count - 1);
             for (int i = 0; i < response.Count - 1; i++)
@@ -243,7 +255,7 @@ namespace Tik4Net.Connector.Api
                 result.Add(new ApiEntityRow(response[i]));
             }
 
-            return result;
+            return result.Cast<ITikEntityRow>().ToList();
         }
 
         /// <summary>
@@ -388,12 +400,20 @@ namespace Tik4Net.Connector.Api
 
         #region IApiConnector Members
 
-        public void ExecuteNonQuery(string command)
+        public void ApiExecuteNonQuery(string command)
         {
             ExecuteNonQuery(command, null);
         }
 
-        public List<string> Execute(string command)
+        public void ApiExecuteNonQuery(string command, Dictionary<string, string> parameters)
+        {
+            Guard.ArgumentNotNull(parameters, "parameters");
+
+            var tmp = parameters.Select(p=> new KeyValuePair<string, string>("=" + p.Key, p.Value));
+            ExecuteNonQuery(command, tmp.ToDictionary(t=>t.Key, t=>t.Value));
+        }
+
+        public List<string> ApiExecute(string command)
         {
             WriteCommand(command);
             List<string> result = ReadResponse();
@@ -401,6 +421,32 @@ namespace Tik4Net.Connector.Api
             //return ExecuteAndReadResponse(command, null, false, null, null, null); - we don't need converting !trap to exception
         }
 
+        public List<string> ApiExecute(string command, Dictionary<string, string> parameters)
+        {
+            string cmd = command;
+            foreach (KeyValuePair<string, string> param in parameters)
+            {
+                cmd += "\n" + "=" + param.Key + "=" + param.Value;
+            }
+
+            return ApiExecute(cmd);
+        }
+
+        public List<ITikEntityRow> ApiExecuteReader(string command)
+        {
+            Guard.ArgumentNotNullOrEmptyString(command, "command");
+
+            return ExecuteReaderInternal(command, null, null, null);
+        }
+
+        public List<ITikEntityRow> ApiExecuteReader(string command, Dictionary<string, string> parameters)
+        {
+            Guard.ArgumentNotNullOrEmptyString(command, "command");
+            Guard.ArgumentNotNull(parameters, "parameters");
+
+            var tmp = parameters.Select(p => new KeyValuePair<string, string>("=" + p.Key, p.Value));
+            return ExecuteReaderInternal(command, null, null, tmp.ToDictionary(t => t.Key, t => t.Value));
+        }
         #endregion
 
         #region ILogConnector Members

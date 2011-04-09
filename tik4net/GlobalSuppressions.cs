@@ -73,3 +73,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ssid", Scope = "member", Target = "Tik4Net.Objects.Interfaces.InterfaceWireless.#WdsIgnoreSsid")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Wds", Scope = "member", Target = "Tik4Net.Objects.Interfaces.InterfaceWireless.#WdsIgnoreSsid")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Wds", Scope = "member", Target = "Tik4Net.Objects.Interfaces.InterfaceWireless.#WdsMode")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Tik4Net.Objects.Ip")]
