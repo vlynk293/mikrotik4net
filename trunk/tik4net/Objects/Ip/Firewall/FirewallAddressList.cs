@@ -18,6 +18,23 @@ namespace Tik4Net.Objects.Ip.Firewall
     /// </summary>    
     public sealed partial class FirewallAddressListList //: TikUnorderedList<FirewallAddressList>
     {
-		//TODO Custom LOAD methods to match filtering needs
+		//Custom LOAD methods to match filtering needs
+
+        /// <summary>
+        /// Loads the address list with given name (filtered).
+        /// </summary>
+        /// <param name="addressListName">Name of the address list.</param>
+        public void LoadByList(string addressListName)
+        {
+            if (string.IsNullOrEmpty(addressListName))
+                LoadAll();
+            else
+            {
+                LoadInternal(new TikConnectorQueryFilterDictionary 
+                    {
+                        {"list", addressListName}
+                    });
+            }
+        }
     }           
 }
