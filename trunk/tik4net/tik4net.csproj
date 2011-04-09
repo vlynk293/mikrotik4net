@@ -122,6 +122,10 @@
     <Compile Include="Objects\Ip\Firewall\FirewallNat.designer.cs">
       <DependentUpon>FirewallNat.cs</DependentUpon>
     </Compile>
+    <Compile Include="Objects\Ip\IpAddress.cs" />
+    <Compile Include="Objects\Ip\IpAddress.designer.cs">
+      <DependentUpon>IpAddress.cs</DependentUpon>
+    </Compile>
     <Compile Include="Objects\Log.cs" />
     <Compile Include="Objects\Log.designer.cs">
       <DependentUpon>Log.cs</DependentUpon>
