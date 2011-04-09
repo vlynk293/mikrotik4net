@@ -17,6 +17,8 @@ namespace HackDisabler
      * - if log items is unsuccessfull password-dictionary atack (ssh/ftp)
      *   than disables atacker IP address (adds item to addresslist)
      * - you can easily drop all packets with src-address-list      
+     * 
+     * REMARKS: in production should be started automatically every 2? minutes (via win. scheduler?)
      */
     class Program
     {
