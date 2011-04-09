@@ -94,6 +94,18 @@
     <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
     <Compile Include="Connector\Api\IApiConnector.cs" />
     <Compile Include="Connector\ILogConnector.cs" />
+    <Compile Include="Objects\Interface.cs" />
+    <Compile Include="Objects\Interface.designer.cs">
+      <DependentUpon>Interface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Interfaces\InterfaceEthernet.cs" />
+    <Compile Include="Objects\Interfaces\InterfaceEthernet.designer.cs">
+      <DependentUpon>InterfaceEthernet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Interfaces\InterfaceWireless.cs" />
+    <Compile Include="Objects\Interfaces\InterfaceWireless.designer.cs">
+      <DependentUpon>InterfaceWireless.cs</DependentUpon>
+    </Compile>
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.cs" />
     <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
       <DependentUpon>FirewallAddressList.cs</DependentUpon>

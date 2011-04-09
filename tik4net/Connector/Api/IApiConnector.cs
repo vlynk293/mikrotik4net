@@ -20,7 +20,7 @@ namespace Tik4Net.Connector.Api
         /// <summary>
         /// Executes the specified command and returns mikrotik response. 
         /// </summary>
-        /// <param name="command">The command.</param>
+        /// <param name="command">The command string in API format (use \n to split rows).</param>
         /// <returns>Command response</returns>
         /// <remarks>Doesn't convert !trap to exceptions. Doesn't perform any tasks on result.</remarks>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]

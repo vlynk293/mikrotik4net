@@ -10,4 +10,7 @@ Mikrotik.ApiGenerator.exe ".\defs\Ip.Firewall.FirewallFilter.xml" "..\tik4net\Ob
 Mikrotik.ApiGenerator.exe ".\defs\Ip.Firewall.FirewallNat.xml" "..\tik4net\Objects\Ip\Firewall\FirewallNat"
 Mikrotik.ApiGenerator.exe ".\defs\Ip.Firewall.FirewallMangle.xml" "..\tik4net\Objects\Ip\Firewall\FirewallMangle"
 Mikrotik.ApiGenerator.exe ".\defs\Ip.Firewall.FirewallAddressList.xml" "..\tik4net\Objects\Ip\Firewall\FirewallAddressList"
-
+REM interface
+Mikrotik.ApiGenerator.exe ".\defs\Interface.xml" "..\tik4net\Objects\Interface"
+Mikrotik.ApiGenerator.exe ".\defs\Interface.InterfaceEthernet.xml" "..\tik4net\Objects\Interfaces\InterfaceEthernet"
+Mikrotik.ApiGenerator.exe ".\defs\Interface.InterfaceWireless.xml" "..\tik4net\Objects\Interfaces\InterfaceWireless"
