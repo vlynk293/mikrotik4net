@@ -1,19 +1,17 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System;
-using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("tik4net")]
-[assembly: AssemblyDescription("Managed .NET API for Mikrotik routers")]
+[assembly: AssemblyTitle("HackDisabler")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Daniel Frantík")]
-[assembly: AssemblyProduct("tik4net")]
-[assembly: AssemblyCopyright("Copyright © Daniel Frantík 2011")]
-[assembly: AssemblyTrademark("tik4net")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("HackDisabler")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -21,11 +19,8 @@ using System.Resources;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-[assembly: CLSCompliant(true)]
-[assembly: NeutralResourcesLanguage("En")]
-
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("98d04c04-b976-4192-a6fc-860060ba0f6a")]
+[assembly: Guid("2cb2722e-c01f-47ff-b2e8-13261877aec2")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -37,5 +32,5 @@ using System.Resources;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.9.1.0")]
-[assembly: AssemblyFileVersion("0.9.1.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

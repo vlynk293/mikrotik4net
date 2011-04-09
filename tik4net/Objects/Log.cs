@@ -84,6 +84,22 @@ namespace Tik4Net.Objects
             LogError(string.Format(CultureInfo.CurrentCulture, format, args));
         }
 
-        //TODO Custom LOAD methods to match filtering needs
+        //Custom LOAD methods to match filtering needs
+
+        /// <summary>
+        /// Loads all log items with given topics (e.q. "system,error,critical").
+        /// </summary>
+        /// <param name="topics">The topics.</param>
+        /// <remarks>Given <paramref name="topics"/> must exactly match log item state (is not parsed).</remarks>
+        public void LoadByTopics(string topics)
+        {
+            if (string.IsNullOrEmpty(topics))
+                LoadAll();
+            else
+                LoadInternal(new TikConnectorQueryFilterDictionary
+                    {
+                        { "topics", topics }
+                    });
+        }
     }           
 }

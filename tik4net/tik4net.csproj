@@ -189,4 +189,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)\tools\"  /R /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -143,7 +143,11 @@ namespace Tik4Net
                 return loadedItems[0];
         }
 
-        private void LoadInternal(TikConnectorQueryFilterDictionary filter)
+        /// <summary>
+        /// Loads the list (with given filter).
+        /// </summary>
+        /// <param name="filter">The list filter.</param>
+        protected void LoadInternal(TikConnectorQueryFilterDictionary filter)
         {
             Clear();
             items.AddRange(LoadItemsInternal(filter, session));

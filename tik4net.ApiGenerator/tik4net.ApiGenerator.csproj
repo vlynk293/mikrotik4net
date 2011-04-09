@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -107,12 +107,6 @@
     <Compile Include="TikSourceGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\tik4net\tik4net.csproj">
-      <Project>{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}</Project>
-      <Name>Mikrotik.Api</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\AutoClassTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +118,12 @@
   <ItemGroup>
     <None Include="Resources\CustomClassTemplate.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tik4net\tik4net.csproj">
+      <Project>{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}</Project>
+      <Name>tik4net</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -133,7 +133,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\tools\"
-copy "$(TargetDir)\tik4net.dll" "$(SolutionDir)\tools\"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)\tools\"  /R /Y
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
