@@ -10,7 +10,7 @@ namespace Tik4Net
     /// Helper class with methods used for checking arguments, type compatibility and so on.
     /// Main idea comes from MS-CAB.
     /// </summary>
-    public static class Guard
+    internal static class Guard
     {
         /// <summary>
         /// Checks a string argument to ensure it isn't null or empty.

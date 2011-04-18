@@ -26,6 +26,33 @@ namespace Tik4Net
         private readonly TikSession session;
 
         /// <summary>
+        /// Gets the count of items that are <see cref="TikEntityBase.IsMarkedNew"/>.
+        /// </summary>
+        /// <value>The count of new items.</value>
+        public int NewCount
+        {
+            get { return items.Count(i => i.IsMarkedNew); }
+        }
+
+        /// <summary>
+        /// Gets the count of items that are <see cref="TikEntityBase.IsMarkedDeleted"/>.
+        /// </summary>
+        /// <value>The count of deleted items.</value>
+        public int DeletedCount
+        {
+            get { return items.Count(i => i.IsMarkedDeleted); }
+        }
+
+        /// <summary>
+        /// Gets the count of items that are <see cref="TikEntityBase.IsModified"/> (and are not deleted or new).
+        /// </summary>
+        /// <value>The count of updated items.</value>
+        public int UpdatedCount
+        {
+            get { return items.Count(i => i.IsModified && !i.IsMarkedNew && !i.IsMarkedDeleted); }
+        }
+
+        /// <summary>
         /// Gets the items in list.
         /// </summary>
         /// <value>The items in list.</value>

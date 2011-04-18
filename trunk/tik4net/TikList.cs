@@ -72,6 +72,15 @@ namespace Tik4Net
 
         #region -- MOVE --
         /// <summary>
+        /// Gets the count of moves that will be performed during save.
+        /// </summary>
+        /// <value>The count of moves.</value>
+        public int MovesCount
+        {
+            get { return entityMoves.Count; }
+        }
+
+        /// <summary>
         /// Moves the specified <paramref name="entityToMove"/> before another <paramref name="entityToMoveBefore"/>.
         /// <para>
         /// Entity is moved in internal list of items and info about move is stored in internal list of moves 
@@ -95,14 +104,18 @@ namespace Tik4Net
             EnsureEntityInList(entityToMove, "entityToMove");
             EnsureEntityInList(entityToMoveBefore, "entityToMoveBefore");
 
+            int entityToMoveIdx = Items.IndexOf(entityToMove);
             int entityToMoveBeforeIdx = Items.IndexOf(entityToMoveBefore);
 
-            //move in list
-            Items.Remove(entityToMove);
-            Items.Insert(entityToMoveBeforeIdx, entityToMove);
+            if (entityToMoveIdx != entityToMoveBeforeIdx - 1) //not on final position
+            {
+                //move in list
+                Items.Remove(entityToMove);
+                Items.Insert(entityToMoveBeforeIdx, entityToMove);
 
-            //remember move (insert or update)
-            entityMoves[entityToMove] =  entityToMoveBefore;
+                //remember move (insert or update)
+                entityMoves[entityToMove] = entityToMoveBefore;
+            }
         }
 
         /// <summary>
@@ -159,6 +172,18 @@ namespace Tik4Net
         protected override void Clear()
         {
             base.Clear();
+            ClearMoves();
+        }
+
+        /// <summary>
+        /// Clears the moves collection (no moves will be performed during Save).
+        /// </summary>
+        /// <remarks>
+        /// Move method call changes order of items in collection and <see cref="ClearMoves"/>
+        /// does not rostore previous order!
+        /// </remarks>
+        public void ClearMoves()
+        {
             entityMoves.Clear();
         }
 
@@ -251,7 +276,7 @@ namespace Tik4Net
         /// listInMikrotik = LoadListFromMikrotik();
         /// listInDb = LoadListFromMikrotik();
         /// //merge the whole list
-        /// listInMikrotik.MergeSubset(listInMikrotik, listInDb, i =&gt; i.Id, (dst, src) =&gt; { dst.Name = src.Name; dst.Priority = src.Priority; } );
+        /// listInMikrotik.MergeSubset(listInMikrotik, listInDb, null, i =&gt; i.Id, (dst, src) =&gt; { dst.Name = src.Name; dst.Priority = src.Priority; } );
         /// listInMikrotik.Save();
         /// </example>
         /// </summary>
@@ -259,8 +284,9 @@ namespace Tik4Net
         /// <param name="data">The data to be metged into this list.</param>
         /// <param name="entityToInsertBeforeFallback">Item are inserted BEFORE this item, if <paramref name="subset"/> is empty (all items from <paramref name="data"/> should be inserted. If is null than items are added at the end of the list (if <paramref name="subset"/> is empty).</param>
         /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
-        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
+        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item. (dst,src)</param>
         /// <remarks>Methods does take care about order of items and performs <see cref="Move"/> methods to reorder <paramref name="subset"/> to the same order as are in <paramref name="data"/>.</remarks>
+        /// <seealso cref="Merge"/>
         public void MergeSubset(IEnumerable<TEntity> subset, IEnumerable<TEntity> data, TEntity entityToInsertBeforeFallback,
             Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
         {
@@ -336,6 +362,31 @@ namespace Tik4Net
                     positionRefEntity = subsetEntity;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Merges the <paramref name="data"/> into this list.
+        /// <para>New items from <paramref name="data"/> are added into this list</para>
+        /// <para>items that are in <paramref name="subset"/> but are missing in data are <see cref="TikEntityBase.MarkDeleted"/>.</para>
+        /// <para>Items with the same key (<paramref name="keyExtractor"/>) are updated by <paramref name="updateDataAction"/>.</para>
+        ///	<example>
+        /// //update mikrotik router to state in database
+        /// listInMikrotik = LoadListFromMikrotik();
+        /// listInDb = LoadListFromMikrotik();
+        /// //merge the whole list
+        /// listInMikrotik.Merge(listInDb, i =&gt; i.Id, (dst, src) =&gt; { dst.Name = src.Name; dst.Priority = src.Priority; } );
+        /// listInMikrotik.Save();
+        /// </example>
+        /// </summary>
+        /// <param name="data">The data to be metged into this list.</param>
+        /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
+        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item. (dst,src)</param>
+        /// <remarks>Methods does take care about order of items and performs <see cref="Move"/> methods to reorder <paramref name="subset"/> to the same order as are in <paramref name="data"/>.</remarks>
+        /// <seealso cref="MergeSubset"/>
+        public void Merge(IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
+        {
+            MergeSubset(this, data, null, keyExtractor, updateDataAction);
         }
     }
 }
