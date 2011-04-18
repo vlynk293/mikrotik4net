@@ -161,6 +161,7 @@ namespace Tik4Net
         {
             isMarkedNew = false;
             isMarkedDeleted = false;
+            properties.MarkClear();
         }
 
         internal Dictionary<string, string> GetAllModifiedProperties()

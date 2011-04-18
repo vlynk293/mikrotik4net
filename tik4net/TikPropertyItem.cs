@@ -99,5 +99,10 @@ namespace Tik4Net
         {
             return itemValue == null ? "null" : itemValue.ToString();
         }
+
+        public void MarkClear()
+        {
+            IsModified = false;
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace HackDisabler
         static string USER = "test";
         static string PASS = "testp1234";
         static string DROP_ADDR_LIST = "TO-DROP"; //use this addresslist in firewal-filter to drop packets
-        static string IP_PREFIX_WHITELIST = "110.43"; //typycally private network prefix - 
+        static string IP_PREFIX_WHITELIST = "10.43"; //typycally private network prefix - 
         static List<string> checkedTechnology = new List<string> { "ssh", "telnet", "winbox", "ftp" }; //disable only if login error was via specified technology
         static Regex loginErrorRegex = new Regex(@"^login failure for user (?<USER>\w+) from (?<IP>[\w\.]+) via (?<CONN>\w+)$");
         static int CNT_OF_LOGINS_PER_IP_LIMIT = 3; //if there were more than 3 different user-names with error login (from single IP), than it is hack-atack.

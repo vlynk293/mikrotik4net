@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{45
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowLevelApiExample", "examples\LowLevelApiExample\LowLevelApiExample.csproj", "{6614221D-60FA-4E6D-A860-6FCC9A2CC36A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergeExample", "MergeExample\MergeExample.csproj", "{DC02E59B-9955-4197-88AF-0A32C5421A2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Code analysis|Any CPU = Code analysis|Any CPU
@@ -42,6 +44,12 @@ Global
 		{6614221D-60FA-4E6D-A860-6FCC9A2CC36A}.Debug|Any CPU.Build.0 = Debug|x86
 		{6614221D-60FA-4E6D-A860-6FCC9A2CC36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6614221D-60FA-4E6D-A860-6FCC9A2CC36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Code analysis|Any CPU.ActiveCfg = Release|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Code analysis|Any CPU.Build.0 = Release|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,5 +57,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8214CFB7-02D8-4C03-B954-C8D1B264F92B} = {45A1BF83-32EB-4B05-8543-CD2F89064C36}
 		{6614221D-60FA-4E6D-A860-6FCC9A2CC36A} = {45A1BF83-32EB-4B05-8543-CD2F89064C36}
+		{DC02E59B-9955-4197-88AF-0A32C5421A2D} = {45A1BF83-32EB-4B05-8543-CD2F89064C36}
 	EndGlobalSection
 EndGlobal

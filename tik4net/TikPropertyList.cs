@@ -268,5 +268,16 @@ namespace Tik4Net
         {
             return string.Join(", ", items.Where(p => p.Value.HasValue).Select(p => p.Key + "=" + p.Value.ToString()).ToArray());
         }
+
+        /// <summary>
+        /// Marks alle properties as unmodified.
+        /// </summary>
+        public void MarkClear()
+        {
+            foreach (KeyValuePair<string, TikPropertyItem> pair in items)
+            {
+                pair.Value.MarkClear();
+            }
+        }
     }
 }
