@@ -76,8 +76,9 @@ namespace Tik4Net
                 TEntity subsetEntity = subsetList.FirstOrDefault(e => EntityKeyEqual(e, dataEntity, keyExtractor));
                 if (subsetEntity != null)
                 {
-                    updateDataAction(subsetEntity, dataEntity);
                     subsetEntity.MarkClear();
+
+                    updateDataAction(subsetEntity, dataEntity); //update if needed
                 }
                 else
                     Add(dataEntity);
