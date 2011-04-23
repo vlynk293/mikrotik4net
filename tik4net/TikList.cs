@@ -200,6 +200,8 @@ namespace Tik4Net
 
         private void SaveAllMoves(TikEntityMetadata metadata, TikSession session)
         {
+            Logger.DebugFormat("Going to perform {0} moves.", MovesCount);
+
             foreach (KeyValuePair<TEntity, TEntity> pair in entityMoves)
             {
                 if (pair.Value != null)

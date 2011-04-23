@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tik4Net.Logging;
 
 namespace Tik4Net.Connector
 {
@@ -27,6 +28,13 @@ namespace Tik4Net.Connector
         /// </summary>
         /// <value><c>true</c> if is logged on; otherwise, <c>false</c>.</value>
         bool LoggedOn { get; }
+
+        /// <summary>
+        /// Sets the logger object (if all commands should be logged).
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <seealso cref="TikSession.AllowConnectorLogging"/>
+        void SetLogger(ILog logger);        
 
         /// <summary>
         /// Creates the <see cref="ITikConnector"/> implementation specific <see cref="ITikEntityRow"/>.
