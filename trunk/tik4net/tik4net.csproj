@@ -94,6 +94,12 @@
     <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
     <Compile Include="Connector\Api\IApiConnector.cs" />
     <Compile Include="Connector\ILogConnector.cs" />
+    <Compile Include="Logging\DummyLog.cs" />
+    <Compile Include="Logging\DummyLogFactory.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\ILogFactory.cs" />
+    <Compile Include="Logging\SystemDiagnosticsLog.cs" />
+    <Compile Include="Logging\SystemDiagnosticsLogFactory.cs" />
     <Compile Include="Objects\Interface.cs" />
     <Compile Include="Objects\Interface.designer.cs">
       <DependentUpon>Interface.cs</DependentUpon>

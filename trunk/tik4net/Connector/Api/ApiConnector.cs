@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Tik4Net.Logging;
 
 namespace Tik4Net.Connector.Api
 {
@@ -26,13 +27,24 @@ namespace Tik4Net.Connector.Api
         private static Regex closeResponseRegex = new Regex(@"^!fatal\s*session terminated on request");
         private TcpClient connection;
         private NetworkStream connectionStream;
+        private ILog logger;
         private bool loggedOn = false;
+
+        internal ApiConnector()
+        {
+        }
 
         #region ITikConnector Members
 
         public bool LoggedOn
         {
             get { return loggedOn; }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "logger")]
+        public void SetLogger(ILog logger)
+        {
+            this.logger = logger;
         }
 
         public void Open(string host, string user, string password)
@@ -476,8 +488,15 @@ namespace Tik4Net.Connector.Api
 
         #endregion
 
+        private void LogDebug(string message)
+        {
+            if (logger != null)
+                logger.Debug(message);
+        }
+
         private void WriteCommand(string command)
         {
+            LogDebug(command);
             string[] lines = command.Split('\n');
             foreach (string line in lines)
             {

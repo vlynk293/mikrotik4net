@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Tik4Net.Connector;
 using System.Globalization;
+using Tik4Net.Logging;
 
 namespace Tik4Net
 {
@@ -38,16 +39,22 @@ namespace Tik4Net
     ///   }
     /// }
     /// </example>
+    /// <para>
+    /// If you want to enable internal logging than you shoud assign your implementation 
+    /// of <see cref="ILogFactory"/> by <see cref="SetLogFactory"/> call.
+    /// </para>
     /// </summary>
     public sealed class TikSession: IDisposable
     {
         [ThreadStatic]
         private static Stack<TikSession> activeSessions = new Stack<TikSession>();
+        private static ILogFactory logFactory = new DummyLogFactory();
 
         private readonly object lockObject = new object();
         private readonly ITikConnector connector;
         private readonly TikConnectorType connectorType;
         private Tik4Net.Objects.System.SystemResource tikRouter;
+        private bool connectorLoggingAllowed = false;
 
         /// <summary>
         /// Gets the active session (lastly created instance of <see cref="TikSession"/>) in current thread.
@@ -62,6 +69,31 @@ namespace Tik4Net
                 else
                     return null;
             }
+        }
+
+        /// <summary>
+        /// Gets the log factory.
+        /// </summary>
+        /// <value>The log factory.</value>
+        /// <seealso cref="SetLogFactory"/>
+        public static ILogFactory LogFactory
+        {
+            get { return logFactory; }
+        }
+
+        /// <summary>
+        /// Sets the log factory (factory that creates instances of <see cref="ILog"/> that
+        /// are used by tik objects to write log messages ).
+        /// </summary>
+        /// <param name="logFactory">The log factory instance.</param>
+        /// <seealso cref="ILogFactory"/>
+        /// <seealso cref="ILog"/>
+        /// <seealso cref="LogFactory"/>
+        /// <see cref="DummyLogFactory"/>
+        /// <seealso cref="SystemDiagnosticsLogFactory"/>
+        public static void SetLogFactory(ILogFactory logFactory)
+        {            
+            TikSession.logFactory = logFactory;
         }
 
         /// <summary>
@@ -106,6 +138,26 @@ namespace Tik4Net
         public bool LoggedOn
         {
             get { return connector.LoggedOn; }
+        }
+
+        /// <summary>
+        /// Sets a value indicating whether connector should log lowlevel command sent to mikrotik router.
+        /// Default value is false.
+        /// </summary>
+        /// <value><c>true</c> if low-level logging is allowed; otherwise, <c>false</c>.</value>
+        /// <seealso cref="SetLogFactory"/>
+        /// <seealso cref="LogFactory"/>
+        public bool AllowConnectorLogging
+        {
+            get { return connectorLoggingAllowed; }
+            set
+            {
+                if (value)
+                    connector.SetLogger(CreateLogger(connector.GetType()));
+                else
+                    connector.SetLogger(null);
+                connectorLoggingAllowed = value;
+            }
         }
 
         /// <summary>
@@ -221,6 +273,11 @@ namespace Tik4Net
                 return castedConnector;
         }
 
+
+        internal static ILog CreateLogger(Type type)
+        {
+            return logFactory.CreateLogger(type);
+        }
 
         #region IDisposable Members
 

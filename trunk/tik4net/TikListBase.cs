@@ -5,6 +5,7 @@ using System.Text;
 using System.Globalization;
 using System.Reflection;
 using Tik4Net.Connector;
+using Tik4Net.Logging;
 
 namespace Tik4Net
 {
@@ -24,6 +25,7 @@ namespace Tik4Net
     {
         private readonly List<TEntity> items;
         private readonly TikSession session;
+        private readonly ILog logger;
 
         /// <summary>
         /// Gets the count of items that are <see cref="TikEntityBase.IsMarkedNew"/>.
@@ -60,6 +62,16 @@ namespace Tik4Net
         protected List<TEntity> Items
         {
             get { return items; }
+        }
+
+        /// <summary>
+        /// Gets the logger object (see <see cref="TikSession.SetLogFactory"/>)
+        /// that allows write log messages (debug messages).
+        /// </summary>
+        /// <value>The logger object.</value>
+        protected ILog Logger
+        {
+            get { return logger; }
         }
 
         /// <summary>
@@ -101,6 +113,7 @@ namespace Tik4Net
 
             this.items = new List<TEntity>();
             this.session = session;
+            this.logger = TikSession.CreateLogger(GetType());
         }
 
         #region -- ITEMS --
@@ -201,6 +214,7 @@ namespace Tik4Net
                 result.Add(item);
             }
 
+            logger.DebugFormat("{0} items loaded.", result.Count);
             return result;
         }
 
@@ -225,6 +239,8 @@ namespace Tik4Net
         {
             TikEntityMetadata metadata = TikEntityMetadata.Get(typeof(TEntity));
 
+            logger.DebugFormat("Going to save {0}/{1}/{2} new/update/delete items.", NewCount, UpdatedCount, DeletedCount);
+
             SaveAllNew(metadata); //must be before position change!!!
             AfterSaveAllNew(metadata, session);
 
@@ -233,6 +249,8 @@ namespace Tik4Net
 
             SaveAllDeleted(metadata); // must be after position changes
             AfterSaveAllDeleted(metadata, session);
+
+            logger.Debug("Successfully saved.");
         }
 
         /// <summary>
