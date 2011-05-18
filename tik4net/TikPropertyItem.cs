@@ -8,6 +8,7 @@ namespace Tik4Net
     internal class TikPropertyItem
     {
         private object itemValue;
+        private object itemOriginalValue;
 
         public bool IsModified { get; private set; }
 
@@ -90,6 +91,11 @@ namespace Tik4Net
             return (string)itemValue;
         }
 
+        public object GetOriginalValue()
+        {
+            return itemOriginalValue;
+        }
+
         public bool IsDataEqual(TikPropertyItem item)
         {
             return object.Equals(item.itemValue, itemValue);
@@ -97,12 +103,16 @@ namespace Tik4Net
 
         public override string ToString()
         {
-            return itemValue == null ? "null" : itemValue.ToString();
+            string originalVal = itemOriginalValue == null ? "null" : itemOriginalValue.ToString();
+            string val = itemValue == null ? "null" : itemValue.ToString();
+
+            return IsModified ? originalVal + "->" + val : val;
         }
 
         public void MarkClear()
         {
             IsModified = false;
+            itemOriginalValue = itemValue;
         }
     }
 }

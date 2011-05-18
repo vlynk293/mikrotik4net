@@ -298,6 +298,8 @@ namespace Tik4Net
                 {
                     Dictionary<string, string> values = entity.GetAllModifiedProperties();
 
+                    Logger.InfoFormat("CREATE: {0}", entity);
+
                     string newId = session.Connector.ExecuteCreate(metadata.EntityPath, values);
                     TEntity newEntity = LoadItem(newId);
                     items[i].Assign(newEntity); //put saved&loaded entity DATA (pointer can not be changed) instead of dirty old-ones data 
@@ -321,6 +323,8 @@ namespace Tik4Net
                         else
                             valuesToSet.Add(pair.Key, pair.Value);
                     }
+
+                    Logger.InfoFormat("UPDATE: {0}", entity);
                     
                     if (valuesToSet.Count > 0)
                         session.Connector.ExecuteSet(metadata.EntityPath, entity.Id, valuesToSet);
@@ -340,6 +344,8 @@ namespace Tik4Net
                 TEntity entity = items[i];
                 if (entity.IsMarkedDeleted)
                 {
+                    Logger.InfoFormat("DELETE: {0}", entity);
+
                     session.Connector.ExecuteDelete(metadata.EntityPath, entity.Id);
                     items.RemoveAt(i); //remove deleted entity from list
                 }

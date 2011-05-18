@@ -204,6 +204,8 @@ namespace Tik4Net
 
             foreach (KeyValuePair<TEntity, TEntity> pair in entityMoves)
             {
+                Logger.InfoFormat("MOVE: {0} before {1} ({2} before {3})", Items.IndexOf(pair.Key), Items.IndexOf(pair.Value), pair.Key, pair.Value);
+
                 if (pair.Value != null)
                     session.Connector.ExecuteMove(metadata.EntityPath, pair.Key.Id, pair.Value.Id);
                 else
