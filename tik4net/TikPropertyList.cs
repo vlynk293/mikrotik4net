@@ -266,7 +266,7 @@ namespace Tik4Net
         /// </returns>
         public override string ToString()
         {
-            return ".id=" + GetAsString(".id") + ", " + string.Join(", ",
+            return ".id=" + GetOrCreateItem(".id").ToString() + ", " + string.Join(", ",
                 items.Where(p => p.Key != ".id" && p.Value.IsModified).OrderBy(p => p.Key).Select(p => p.Key + "=" + p.Value.ToString()).Concat( //modified first
                 items.Where(p => p.Key != ".id" && !p.Value.IsModified && p.Value.HasValue).OrderBy(p => p.Key).Select(p => p.Key + "=" + p.Value.ToString())).ToArray()); //and unmodified with values next
         }
