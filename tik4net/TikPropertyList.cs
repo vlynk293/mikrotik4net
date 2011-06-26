@@ -119,6 +119,7 @@ namespace Tik4Net
         /// </summary>
         /// <param name="attributeName">Name of the attribute.</param>
         /// <returns>Attribute value or default value.</returns>
+        /// <exception cref="InvalidOperationException">If property is not defined.</exception>
         public string GetAsString(string attributeName)
         {
             TikPropertyItem item = GetOrCreateItem(attributeName);

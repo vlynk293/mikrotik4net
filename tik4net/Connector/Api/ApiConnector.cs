@@ -20,10 +20,11 @@ namespace Tik4Net.Connector.Api
         private const int API_DEFAULT_PORT = 8728;
         private static Regex trapRegex = new Regex(@"^!trap\s*(?<ERROR>.*)$");
         private static Regex fatalRegex = new Regex(@"^!fatal\s*(?<ERROR>.*)$");
-        private static Regex logonResponseRegex = new Regex(@"^!done\n=ret=(?<HASH>[0-9a-f]+)$", RegexOptions.Singleline);
+        //private static Regex logonResponseRegex = new Regex(@"^!done\s*=ret=(?<HASH>[0-9a-f]+)$", RegexOptions.Singleline);
         private static Regex doneRegex = new Regex(@"^!done$");
         private static Regex dataRowRegex = new Regex(@"^!re");
-        private static Regex createResponseRegex = new Regex(@"^!done\s*=ret=(?<ID>.+)$");
+        private static Regex scalarResponseRegex = new Regex(@"^!done\s*=ret=(?<RESULT>.+)$", RegexOptions.Singleline);
+        //private static Regex createResponseRegex = new Regex(@"^!done\s*=ret=(?<ID>.+)$");
         private static Regex closeResponseRegex = new Regex(@"^!fatal\s*session terminated on request");
         private TcpClient connection;
         private NetworkStream connectionStream;
@@ -62,8 +63,8 @@ namespace Tik4Net.Connector.Api
             connectionStream = connection.GetStream();                        
 
             //logon
-            string response = ExecuteAndReadResponse("/login", null, logonResponseRegex);
-            string hashedPass = ApiConnectorHelper.EncodePassword(password, logonResponseRegex.Match(response).Groups["HASH"].Value); //performace - logonResponseRegex is validated twice
+            string responseHash = ExecuteScalar("/login", null); //ExecuteAndReadResponse("/login", null, logonResponseRegex);
+            string hashedPass = ApiConnectorHelper.EncodePassword(password, responseHash); 
             ExecuteNonQuery("/login", 
                 new Dictionary<string, string> 
                 {
@@ -290,9 +291,11 @@ namespace Tik4Net.Connector.Api
                 parameters.Add("=" + valPair.Key, valPair.Value);
 
             string command = entityPath + "/add";
-            string result = ExecuteAndReadResponse(command, parameters, createResponseRegex);
 
-            return createResponseRegex.Match(result).Groups["ID"].Value; //performace - createResponseRegex is validated twice
+            return ExecuteScalar(command, parameters);
+            //string result = ExecuteAndReadResponse(command, parameters, scalarResponseRegex);
+
+            //return scalarResponseRegex.Match(result).Groups["RESULT"].Value; //performace - createResponseRegex is validated twice
         }
 
         /// <summary>
@@ -458,6 +461,26 @@ namespace Tik4Net.Connector.Api
 
             var tmp = parameters.Select(p => new KeyValuePair<string, string>("=" + p.Key, p.Value));
             return ExecuteReaderInternal(command, null, null, tmp.ToDictionary(t => t.Key, t => t.Value));
+        }
+
+        private string ExecuteScalar(string command, Dictionary<string, string> parameters)
+        {
+            Guard.ArgumentNotNullOrEmptyString(command, "command");
+            string resultRow = ExecuteAndReadResponse(command, parameters, scalarResponseRegex);
+
+            return scalarResponseRegex.Match(resultRow).Groups["RESULT"].Value; //performace: scalarResponseRegex is used twice
+        }
+
+        public string ApiExecuteScalar(string command)
+        {
+            return ExecuteScalar(command, null);
+        }
+
+        public string ApiExecuteScalar(string command, Dictionary<string, string> parameters)
+        {
+            Guard.ArgumentNotNull(parameters, "parameters");
+            var tmp = parameters.ToDictionary(p => "=" + p.Key, p => p.Value);
+            return ExecuteScalar(command, tmp);          
         }
         #endregion
 
