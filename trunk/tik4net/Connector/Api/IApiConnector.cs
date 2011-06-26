@@ -54,10 +54,25 @@ namespace Tik4Net.Connector.Api
         /// Executes the specified command and returns mikrotik response.
         /// </summary>
         /// <param name="command">The command string in API format (use \n to split rows).</param>
-        /// <param name="parameters">The parameters.</param>
+        /// <param name="parameters">The parameters (key, value).</param>
         /// <returns>Command response</returns>
         /// <remarks>Doesn't convert !trap to exceptions. Doesn't perform any tasks on result.</remarks>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         List<string> ApiExecute(string command, Dictionary<string, string> parameters);
+
+        /// <summary>
+        /// Executes command (API specific) that returns exactly one value as response.
+        /// </summary>
+        /// <param name="command">The command (formated).</param>
+        /// <returns>Response value.</returns>
+        string ApiExecuteScalar(string command);
+
+        /// <summary>
+        /// Executes command (API specific) that returns exactly one value as response.
+        /// </summary>
+        /// <param name="command">The command (formated).</param>
+        /// <param name="parameters">The parameters (key, value).</param>
+        /// <returns>Response value.</returns>
+        string ApiExecuteScalar(string command, Dictionary<string, string> parameters);
     }
 }
