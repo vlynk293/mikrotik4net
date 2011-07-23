@@ -47,33 +47,33 @@ namespace Tik4Net
         /// <summary>
         /// Sets the property (attribute) value (<see cref="IsModified"/> becomes true).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void SetAttribute(string attributeName, string value)
+        public void SetPropertyValue(string propertyName, string value)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             item.SetValue(value);
         }
 
         /// <summary>
         /// Sets the attribute value (<see cref="IsModified"/> becomes true).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void SetAttribute(string attributeName, long? value)
+        public void SetPropertyValue(string propertyName, long? value)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             item.SetValue(value);
         }
 
         /// <summary>
         /// Sets the attribute value (<see cref="IsModified"/> becomes true).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void SetAttribute(string attributeName, bool? value)
+        public void SetPropertyValue(string propertyName, bool? value)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             item.SetValue(value);
         }
 
@@ -81,84 +81,85 @@ namespace Tik4Net
         /// Creates the new (attribute could not exists before) attribute value 
         /// (<see cref="IsModified"/> of attribute is false).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void CreateAttribute(string attributeName, string value)
+        public void CreatePropertyWithValue(string propertyName, string value)
         {
             TikPropertyItem item = new TikPropertyItem(value);
-            items.Add(attributeName, item);
+            items.Add(propertyName, item);
         }
 
         /// <summary>
         /// Creates the new (attribute could not exists before) attribute value 
         /// (<see cref="IsModified"/> of attribute is false).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void CreateAttribute(string attributeName, bool? value)
+        public void CreatePropertyWithValue(string propertyName, bool? value)
         {
             TikPropertyItem item = new TikPropertyItem(value);
-            items.Add(attributeName, item);
+            items.Add(propertyName, item);
         }
 
         /// <summary>
         /// Creates the new (attribute could not exists before) attribute value 
         /// (<see cref="IsModified"/> of attribute is false).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <param name="value">The value.</param>
-        public void CreateAttribute(string attributeName, long? value)
+        public void CreatePropertyWithValue(string propertyName, long? value)
         {
             TikPropertyItem item = new TikPropertyItem(value);
-            items.Add(attributeName, item);
+            items.Add(propertyName, item);
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as string (or returns 
-        /// default value if does not exists).
+        /// Gets attribute <paramref name="propertyName"/> as string (value must be set!).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or default value.</returns>
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or exception.</returns>
         /// <exception cref="InvalidOperationException">If property is not defined.</exception>
-        public string GetAsString(string attributeName)
+        public string GetAsString(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             return item.GetAsString();
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as bool (or returns 
+        /// Gets attribute <paramref name="propertyName"/> as bool (or returns 
         /// default value if does not exists).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or default value.</returns>
-        public bool GetAsBoolean(string attributeName)
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or exception.</returns>
+        /// <exception cref="InvalidOperationException">If property is not defined.</exception>
+        public bool GetAsBoolean(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             return item.GetAsBool();
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as Int64 (or returns 
+        /// Gets attribute <paramref name="propertyName"/> as Int64 (or returns 
         /// default value if does not exists).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or default value.</returns>
-        public long GetAsInt64(string attributeName)
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or exception.</returns>
+        /// <exception cref="InvalidOperationException">If property is not defined.</exception>
+        public long GetAsInt64(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             return item.GetAsInt64();
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as string (or returns 
+        /// Gets attribute <paramref name="propertyName"/> as string (or returns 
         /// null if does not exists).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or null.</returns>
-        public string GetAsStringOrNull(string attributeName)
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or null.</returns>
+        public string GetAsStringOrNull(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             if (item.HasValue)
                 return item.GetAsString();
             else
@@ -166,14 +167,14 @@ namespace Tik4Net
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as bool (or returns 
+        /// Gets attribute <paramref name="propertyName"/> as bool (or returns 
         /// null if does not exists).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or null.</returns>
-        public bool? GetAsBooleanOrNull(string attributeName)
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or null.</returns>
+        public bool? GetAsBooleanOrNull(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             if (item.HasValue)
                 return item.GetAsBool();
             else
@@ -181,14 +182,14 @@ namespace Tik4Net
         }
 
         /// <summary>
-        /// Gets attribute <paramref name="attributeName"/> as Int64 (or returns 
+        /// Gets attribute <paramref name="propertyName"/> as Int64 (or returns 
         /// null if does not exists).
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
-        /// <returns>Attribute value or null.</returns>
-        public long? GetAsInt64OrNull(string attributeName)
+        /// <param name="propertyName">Name of the single property.</param>
+        /// <returns>Property value or null.</returns>
+        public long? GetAsInt64OrNull(string propertyName)
         {
-            TikPropertyItem item = GetOrCreateItem(attributeName);
+            TikPropertyItem item = GetOrCreateItem(propertyName);
             if (item.HasValue)
                 return item.GetAsInt64();
             else
@@ -196,16 +197,16 @@ namespace Tik4Net
         }
 
         /// <summary>
-        /// Determines whether contains attribute with the specified attribute name and attribute has value.
+        /// Determines whether contains property with the specified <paramref name="propertyName"/> and property has assigned value.
         /// </summary>
-        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="propertyName">Name of the single property.</param>
         /// <returns>
-        /// 	<c>true</c> if contains attribute the specified attribute name and attribute has value; otherwise, <c>false</c>.
+        /// 	<c>true</c> if contains property with the specified name and it has assigned value; otherwise, <c>false</c>.
         /// </returns>
-        public bool ContainsAttributeWithValue(string attributeName)
+        public bool ContainsAssignedProperty(string propertyName)
         {
             TikPropertyItem item;
-            if (!items.TryGetValue(attributeName, out item))
+            if (!items.TryGetValue(propertyName, out item))
                 return false;
             else
                 return item.HasValue;

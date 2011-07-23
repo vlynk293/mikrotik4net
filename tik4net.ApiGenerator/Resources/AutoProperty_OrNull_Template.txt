@@ -1,0 +1,18 @@
+        /// <summary>
+        /// Row %PropertyDataName% property variant that could be used for bindings (doesn't throw exceptions when not set - underlying property is madatory).
+        /// Use <see cref="%PropertyName%"/> in other cases.
+        /// </summary>
+        public %FieldType% %PropertyName%OrNull 
+        { 
+            get { return Properties.%GetMethod%("%PropertyDataName%"); }
+            set { Properties.SetPropertyValue("%PropertyDataName%", value); }
+        }   
+                
+        /// <summary>
+        /// Gets a value indicating whether <see cref="%PropertyName%"/> property has been set.
+        /// </summary>
+        /// <value><c>true</c> if <see cref="%PropertyName%"/> has been set; otherwise, <c>false</c>.</value>        
+        public bool %PropertyName%IsSet
+        {
+            get { return Properties.ContainsAssignedProperty("%PropertyDataName%"); }
+        }        
