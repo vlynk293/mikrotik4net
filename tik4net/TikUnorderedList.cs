@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace Tik4Net
 {
@@ -107,6 +108,34 @@ namespace Tik4Net
         public void Merge(IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
         {
             MergeSubset(this, data, keyExtractor, updateDataAction);
+        }
+
+        /// <summary>
+        /// See <see cref="IList.IsReadOnly"/> for details. Returns false.
+        /// </summary>
+        /// <value>Always false.</value>
+        public override bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// See <see cref="IList.IsFixedSize"/> for details. Returns false.
+        /// </summary>
+        /// <value>Always false.</value>
+        public override bool IsFixedSize
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// See <see cref="TikListBase{TEntity}.OnInsert"/> for details.
+        /// Calls <see cref="TikListBase{TEntity}.BeforeAdd"/> and later insert on internal <see cref="TikListBase{TEntity}.Items"/> collection.
+        /// </summary>
+        protected override void OnInsert(int index, TEntity item)
+        {
+            BeforeAdd(item);
+            Items.Insert(index, item);
         }
     }
 }

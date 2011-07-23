@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Collections;
 
 namespace Tik4Net
 {
@@ -55,6 +56,34 @@ namespace Tik4Net
 
             if (Items.Count > 0)
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Can not add second row to SingleRowList '{0}'.", this));
+        }
+
+        /// <summary>
+        /// See <see cref="IList.IsReadOnly"/> for details. Returns false.
+        /// </summary>
+        /// <value>Always false.</value>
+        public override bool IsReadOnly
+        {            
+            get { return false; }
+        }
+
+        /// <summary>
+        /// See <see cref="IList.IsFixedSize"/> for details. Returns true.
+        /// </summary>
+        /// <value>Always true.</value>
+        public override bool IsFixedSize
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// See <see cref="TikListBase{TEntity}.OnInsert"/> for details.
+        /// Calls <see cref="TikListBase{TEntity}.BeforeAdd"/> and later <see cref="TikListBase{TEntity}.Add(TEntity)"/>.
+        /// </summary>
+        protected override void OnInsert(int index, TEntity item)
+        {
+            BeforeAdd(item);
+            Add(item);
         }
     }
 }
