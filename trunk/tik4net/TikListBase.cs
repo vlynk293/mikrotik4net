@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using Tik4Net.Connector;
 using Tik4Net.Logging;
+using System.Collections;
 
 namespace Tik4Net
 {
@@ -20,9 +21,10 @@ namespace Tik4Net
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity in list.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public abstract class TikListBase<TEntity>: ITikList, IEnumerable<TEntity>
+    public abstract class TikListBase<TEntity>: ITikList, IEnumerable<TEntity>, IList, IList<TEntity>
         where TEntity : TikEntityBase, new()
     {
+        private readonly object lockObj = new object();
         private readonly List<TEntity> items;
         private readonly TikSession session;
         private readonly ILog logger;
@@ -130,13 +132,13 @@ namespace Tik4Net
         /// <summary>
         /// Adds the specified entity to the end of item list.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param name="item">The entity.</param>
         /// <remarks>Entity must be <see cref="TikEntityBase.IsMarkedNew"/> (it would be created on mikrotik during <see cref="Save"/>).</remarks>
-        public void Add(TEntity entity)
+        public void Add(TEntity item)
         {
-            Guard.ArgumentNotNull(entity, "entity");
-            BeforeAdd(entity);
-            items.Add(entity);
+            Guard.ArgumentNotNull(item, "item");
+            BeforeAdd(item);
+            items.Add(item);
         }
 
         /// <summary>
@@ -373,6 +375,189 @@ namespace Tik4Net
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return items.GetEnumerator();
+        }
+
+        #endregion
+
+        #region IList Members
+
+        int IList.Add(object value)
+        {
+            TEntity castedValue = (TEntity)value;
+
+            Add(castedValue);
+            return IndexOf(castedValue);
+        }
+
+        void IList.Clear()
+        {
+            Clear();
+        }
+
+        bool IList.Contains(object value)
+        {
+            return ((IList)items).Contains(value);
+        }
+
+        int IList.IndexOf(object value)
+        {
+            return ((IList)items).IndexOf(value);
+        }
+
+        void IList.Insert(int index, object value)
+        {
+            TEntity castedValue = (TEntity)value;
+
+            Insert(index, castedValue);
+        }
+
+        /// <summary>
+        /// See <see cref="IList.IsFixedSize"/> for details.
+        /// </summary>
+        public abstract bool IsFixedSize { get; }
+
+        /// <summary>
+        /// See <see cref="IList.IsReadOnly"/> for details.
+        /// </summary>
+        public abstract bool IsReadOnly { get ; }
+
+        void IList.Remove(object value)
+        {
+            TEntity castedValue = (TEntity)value;
+
+            Remove(castedValue);
+        }
+
+        object IList.this[int index]
+        {
+            get { return items[index]; }
+            set 
+            { 
+                TEntity castedValue = (TEntity)value;
+                items[index] = castedValue;            
+            }
+        }
+
+        #endregion
+
+        #region ICollection Members
+
+        /// <summary>
+        /// See <see cref="ICollection.CopyTo"/> for details.
+        /// </summary>
+        public void CopyTo(Array array, int index)
+        {
+            ((ICollection)items).CopyTo(array, index);
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection.Count"/> for details.
+        /// </summary>
+        public int Count
+        {
+            get { return items.Count; }
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection.IsSynchronized"/> for details. Is always false.
+        /// </summary>
+        public bool IsSynchronized
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection.SyncRoot"/> for details. 
+        /// </summary>
+        public object SyncRoot
+        {
+            get { return lockObj; }
+        }
+
+        #endregion
+
+        #region IList<TEntity> Members
+
+        /// <summary>
+        /// See <see cref="IList{T}.IndexOf"/> for details.
+        /// </summary>
+        public int IndexOf(TEntity item)
+        {
+            return items.IndexOf(item);
+        }
+
+        /// <summary>
+        /// See <see cref="IList{T}.Insert"/> for details.
+        /// </summary>
+        public void Insert(int index, TEntity item)
+        {
+            OnInsert(index, item);
+        }
+
+        /// <summary>
+        /// Called from <see cref="Insert"/>. Must be implemented by descendant class.
+        /// </summary>
+        /// <param name="index">The index where item should be inserted.</param>
+        /// <param name="item">The item to be inserted.</param>
+        protected abstract void OnInsert(int index, TEntity item);
+
+        /// <summary>
+        /// See <see cref="IList{T}.RemoveAt"/> for details.
+        /// </summary>
+        public void RemoveAt(int index)
+        {
+            Items.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// See <see cref="IList{T}"/> for details.
+        /// </summary>
+        public TEntity this[int index]
+        {
+            get
+            {
+                return items[index];
+            }
+            set
+            {
+                items[index] = value;
+            }
+        }
+
+        #endregion
+
+        #region ICollection<TEntity> Members
+
+        /// <summary>
+        /// See <see cref="ICollection{T}.Clear"/> for details.
+        /// </summary>
+        void ICollection<TEntity>.Clear()
+        {
+            Clear();
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection{T}.Contains"/> for details.
+        /// </summary>
+        public bool Contains(TEntity item)
+        {
+            return items.Contains(item);
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection{T}.CopyTo"/> for details.
+        /// </summary>
+        public void CopyTo(TEntity[] array, int arrayIndex)
+        {
+            items.CopyTo(array, arrayIndex);
+        }
+
+        /// <summary>
+        /// See <see cref="ICollection{T}.Remove"/> for details.
+        /// </summary>
+        public bool Remove(TEntity item)
+        {
+            return items.Remove(item);
         }
 
         #endregion
