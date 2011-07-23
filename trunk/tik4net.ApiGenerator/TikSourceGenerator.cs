@@ -63,10 +63,12 @@ namespace Tik4Net.ApiGenerator
                     string propertyFieldName = propertyNode.Attributes["fieldName"].Value;
                     string propertyType = propertyNode.Attributes["type"].Value;
                     bool propertyMandatory = StringHelper.StrToBool(propertyNode.Attributes["mandatory"].Value);
-                    string propertyClrType = propertyMandatory ? propertyType : StringHelper.MakeClrTypeNulable(propertyType);
                     string propertyEditMode = propertyNode.Attributes["editMode"].Value;
-                    string propertyPossibleSetterRem = setterPossibleRem;
-                    if (propertyEditMode == "ReadOnly")
+                    bool propertyReadOnly = propertyEditMode == "ReadOnly";
+                    string propertyClrType = propertyMandatory & !propertyReadOnly ? propertyType : StringHelper.MakeClrTypeNulable(propertyType);
+                    string propertyPossibleSetterRem = setterPossibleRem;                   
+
+                    if (propertyReadOnly)
                         propertyPossibleSetterRem = "// Property R/O ";
                     
                     if (propertyMode == "auto")
@@ -75,11 +77,22 @@ namespace Tik4Net.ApiGenerator
                             .Replace("%PropertyDataName%", propertyName)
                             .Replace("%PropertyName%", propertyFieldName)
                             .Replace("%FieldType%", propertyClrType)
-                            .Replace("%GetMethod%", StringHelper.PropertyTypeToGetMethod(propertyType, propertyMandatory))
+                            .Replace("%GetMethod%", StringHelper.PropertyTypeToGetMethod(propertyType, propertyMandatory & !propertyReadOnly)) //R/O property is null in New object
                             .Replace("%Mandatory%", StringHelper.BoolToStr(propertyMandatory))
                             .Replace("%SetterPossibleRem%", propertyPossibleSetterRem)
                             .Replace("%PropertyEditMode%", propertyEditMode);
                         autoPropertiesSource.Add(propertySource);
+
+                        if (propertyMandatory && !propertyReadOnly)
+                        {
+                            //Add _OrNull property variant.
+                            string propertyOrNullSource = Resources.AutoProperty_OrNull_Template
+                                .Replace("%PropertyDataName%", propertyName)
+                                .Replace("%PropertyName%", propertyFieldName)
+                                .Replace("%FieldType%", StringHelper.MakeClrTypeNulable(propertyType)) //always nullable
+                                .Replace("%GetMethod%", StringHelper.PropertyTypeToGetMethod(propertyType, false));
+                            autoPropertiesSource.Add(propertyOrNullSource);
+                        }
                     }
                     else if (propertyMode == "custom")
                     {

@@ -124,6 +124,9 @@
   <data name="AutoPropertyTemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AutoPropertyTemplate.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1250</value>
   </data>
+  <data name="AutoProperty_OrNull_Template" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AutoProperty_OrNull_Template.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1250</value>
+  </data>
   <data name="CustomClassTemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CustomClassTemplate.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1250</value>
   </data>

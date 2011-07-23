@@ -5,5 +5,5 @@
         public %FieldType% %PropertyName% 
         { 
             get { return Properties.%GetMethod%("%PropertyDataName%"); }
-            %SetterPossibleRem%set { Properties.SetAttribute("%PropertyDataName%", value); }
+            %SetterPossibleRem%set { Properties.SetPropertyValue("%PropertyDataName%", value); }
         }        	

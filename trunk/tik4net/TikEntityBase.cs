@@ -71,12 +71,12 @@ namespace Tik4Net
         /// <summary>
         /// Gets the id of entity.
         /// </summary>
-        /// <value>The entity id.</value>
+        /// <value>The entity id or null for new instance.</value>
         [TikProperty(".id", typeof(string), true, TikPropertyEditMode.ReadOnly)]
         public string Id
         {
-            get { return properties.GetAsString(".id"); }
-        }
+            get { return properties.GetAsStringOrNull(".id"); }
+        }       
 
         /// <summary>
         /// See <see cref="ITikEntity.LoadFromEntityRow"/> for details.
@@ -90,11 +90,11 @@ namespace Tik4Net
             foreach (KeyValuePair<string, TikPropertyAttribute> propPair in entityMetadata.Properties)
             {
                 if (propPair.Value.PropertyType == typeof(string))
-                    Properties.CreateAttribute(propPair.Key, entityRow.GetStringValueOrNull(propPair.Key, propPair.Value.Mandatory));
+                    Properties. CreatePropertyWithValue(propPair.Key, entityRow.GetStringValueOrNull(propPair.Key, propPair.Value.Mandatory));
                 else if ((propPair.Value.PropertyType == typeof(long)) || propPair.Value.PropertyType == typeof(long?))
-                    Properties.CreateAttribute(propPair.Key, entityRow.GetInt64ValueOrNull(propPair.Key, propPair.Value.Mandatory)); //long.Parse(entityRow.GetValue(propPair.Key), System.Globalization.CultureInfo.CurrentCulture)
+                    Properties.CreatePropertyWithValue(propPair.Key, entityRow.GetInt64ValueOrNull(propPair.Key, propPair.Value.Mandatory)); //long.Parse(entityRow.GetValue(propPair.Key), System.Globalization.CultureInfo.CurrentCulture)
                 else if ((propPair.Value.PropertyType == typeof(bool)) || (propPair.Value.PropertyType == typeof(bool?)))
-                    Properties.CreateAttribute(propPair.Key, entityRow.GetBoolValueOrNull(propPair.Key, propPair.Value.Mandatory)); //string.Equals(entityRow.GetValue(propPair.Key), "true", StringComparison.OrdinalIgnoreCase)
+                    Properties.CreatePropertyWithValue(propPair.Key, entityRow.GetBoolValueOrNull(propPair.Key, propPair.Value.Mandatory)); //string.Equals(entityRow.GetValue(propPair.Key), "true", StringComparison.OrdinalIgnoreCase)
                 else
                     throw new NotImplementedException(string.Format(CultureInfo.CurrentCulture, "Not supported property '{0}' type '{1}' in {2}.", propPair.Key, propPair.Value.PropertyType, this));
                 //catch (FormatException ex)
@@ -175,7 +175,7 @@ namespace Tik4Net
                 bool modified;
                 bool hasValue;
                 properties.GetPropertyState(propPair.Key, out found, out modified, out hasValue);
-                if (found && modified)
+                if ((propPair.Value.EditMode == TikPropertyEditMode.Editable) && found && modified)
                 {
                     string valueAsText;
                     if (!hasValue)
