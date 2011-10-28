@@ -44,10 +44,14 @@ namespace Tik4Net
     /// of <see cref="ILogFactory"/> by <see cref="SetLogFactory"/> call.
     /// </para>
     /// </summary>
+    /// <remarks>Instance is not threadsafe - never use it in more than one thread!!! 
+    /// Active session list is specific for thread - so you could neve share sessions
+    /// across threads.
+    /// </remarks>
     public sealed class TikSession: IDisposable
     {
         [ThreadStatic]
-        private static Stack<TikSession> activeSessions = new Stack<TikSession>();
+        private static Stack<TikSession> activeSessions;
         private static ILogFactory logFactory = new DummyLogFactory();
 
         private readonly object lockObject = new object();
@@ -63,8 +67,8 @@ namespace Tik4Net
         public static TikSession ActiveSession
         {
             get
-            {
-                if (activeSessions.Count > 0)
+            {                
+                if (activeSessions != null && activeSessions.Count > 0)
                     return activeSessions.Peek();
                 else
                     return null;
@@ -215,6 +219,8 @@ namespace Tik4Net
 
             this.connectorType = connectorType;
 
+            if (activeSessions == null)
+                activeSessions = new Stack<TikSession>();
             activeSessions.Push(this);
         }
         /// <summary>
@@ -287,7 +293,8 @@ namespace Tik4Net
         /// </summary>
         public void Dispose()
         {
-            activeSessions.Pop();
+            if (activeSessions != null)
+                activeSessions.Pop();
             connector.Close();
         }
 
