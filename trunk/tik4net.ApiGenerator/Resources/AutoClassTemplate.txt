@@ -14,8 +14,8 @@ namespace Tik4Net.Objects%EntityDotedPath%
     /// <summary>
     /// Represents one row in %EntityPath% on mikrotik router.
     /// </summary>
-    [TikEntity("%EntityPath%", TikEntityEditMode.%EditMode%)]    
-    public sealed partial class %EntityName%: TikEntityBase
+    [TikEntity("%EntityPath%", TikEntityEditMode.%EditMode%, %EntityReadFlags%)]    
+    public sealed partial class %EntityName%: TikEntityBase %PossibleITikEntityWithId%
     {
         %EntityProperties%
     }
@@ -24,7 +24,7 @@ namespace Tik4Net.Objects%EntityDotedPath%
     /// Represents list of rows in %EntityPath% on mikrotik router.
     /// </summary>    
     [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]    
-    public sealed partial class %EntityName%List : %ListType%<%EntityName%>
+    public sealed partial class %EntityName%List : %ListType%<%EntityName%> %PossibleIEditableTikList%
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="%EntityName%List"/> class.
@@ -43,5 +43,7 @@ namespace Tik4Net.Objects%EntityDotedPath%
             : base(session)
         {
         }
-    }           
+
+		%PossibleRWMethods%
+	}           
 }

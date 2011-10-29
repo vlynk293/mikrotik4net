@@ -12,8 +12,13 @@ namespace Tik4Net
 {
     /// <summary>
     /// Base class for list of <see cref="TikEntityBase"/>.
-    /// Supports enumeration, Load access (<see cref="LoadAll"/>, <see cref="LoadItem"/>)
-    /// and Save access (<see cref="Save"/>).
+    /// Supports enumeration, Load access (<see cref="LoadAll"/>, <see cref="LoadItem"/>).
+    /// <para>
+    /// Save access (<see cref="SaveInternal"/>) are supported only if <typeparamref name="TEntity"/> 
+    /// is of <see cref="ITikEntityWithId"/> type. Than derived class should
+    /// expose <see cref="IEditableTikList"/> enterface with <see cref="IEditableTikList.Save"/> method
+    /// that calls <see cref="SaveInternal"/>.
+    /// </para>
     /// <para>
     /// Uses <see cref="TikSession"/> given in constructor or obtain by
     /// <see cref="TikSession.ActiveSession"/> call.
@@ -22,7 +27,7 @@ namespace Tik4Net
     /// <typeparam name="TEntity">The type of the entity in list.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public abstract class TikListBase<TEntity>: ITikList, IEnumerable<TEntity>, IList, IList<TEntity>
-        where TEntity : TikEntityBase, new()
+        where TEntity : ITikEntity, IChangeTrackingEntity, new() 
     {
         private readonly object lockObj = new object();
         private readonly List<TEntity> items;
@@ -133,7 +138,8 @@ namespace Tik4Net
         /// Adds the specified entity to the end of item list.
         /// </summary>
         /// <param name="item">The entity.</param>
-        /// <remarks>Entity must be <see cref="TikEntityBase.IsMarkedNew"/> (it would be created on mikrotik during <see cref="Save"/>).</remarks>
+        /// <remarks>Entity must be <see cref="TikEntityBase.IsMarkedNew"/> 
+        /// (it would be created on mikrotik during <see cref="IEditableTikList.Save"/> (<see cref="SaveInternal"/>)).</remarks>
         public void Add(TEntity item)
         {
             Guard.ArgumentNotNull(item, "item");
@@ -180,7 +186,7 @@ namespace Tik4Net
             if (loadedItems.Count > 1)
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "More than one item with id {0} returned in {1}.", id, GetType()));
             else if (loadedItems.Count == 0)
-                return null; 
+                return default(TEntity); 
             else
                 return loadedItems[0];
         }
@@ -203,9 +209,9 @@ namespace Tik4Net
             TikEntityMetadata entityMetadata = TikEntityMetadata.Get(typeof(TEntity));
             IEnumerable<ITikEntityRow> response;
             if (filter != null)
-                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.PropertyNames, filter);
+                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.ReaderBehavior, entityMetadata.PropertyNames, filter);
             else
-                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.PropertyNames);
+                response = session.Connector.ExecuteReader(entityMetadata.EntityPath, entityMetadata.ReaderBehavior, entityMetadata.PropertyNames);
 
             VerifyResponseRows(response);
 
@@ -233,14 +239,17 @@ namespace Tik4Net
 
         #region -- SAVE --
         /// <summary>
-        /// Saves this instance - saves all entities tha are in <see cref="TikEntityBase.IsModified"/>, 
+        /// Saves this instance (is protected because not all list are savable = <see cref="IEditableTikList"/> - derived class should expose public Save() method.) 
+        /// - saves all entities tha are in <see cref="TikEntityBase.IsModified"/>, 
         /// <see cref="TikEntityBase.IsMarkedDeleted"/> and <see cref="TikEntityBase.IsMarkedNew"/> states.
         /// Uses session from constructor.
         /// </summary>
-        public void Save()
+        protected void SaveInternal()
         {
-            TikEntityMetadata metadata = TikEntityMetadata.Get(typeof(TEntity));
+            if (typeof(TEntity).GetInterface(typeof(ITikEntityWithId).Name) == null)
+                throw new NotSupportedException("TEntity must be of ITikEntityWithId type when usign SaveInternal method.");
 
+            TikEntityMetadata metadata = TikEntityMetadata.Get(typeof(TEntity));
             logger.DebugFormat("Going to save {0}/{1}/{2} new/update/delete items.", NewCount, UpdatedCount, DeletedCount);
 
             SaveAllNew(metadata); //must be before position change!!!
@@ -314,6 +323,7 @@ namespace Tik4Net
             for (int i = 0; i < items.Count; i++)
             {
                 TEntity entity = items[i];
+                ITikEntityWithId entityAsEntityWithId = ((ITikEntityWithId)entity);
                 if (entity.IsModified)
                 {                    
                     Dictionary<string, string> valuesToSet = new Dictionary<string, string>();
@@ -329,11 +339,11 @@ namespace Tik4Net
                     Logger.InfoFormat("UPDATE: {0}", entity);
                     
                     if (valuesToSet.Count > 0)
-                        session.Connector.ExecuteSet(metadata.EntityPath, entity.Id, valuesToSet);
+                        session.Connector.ExecuteSet(metadata.EntityPath, entityAsEntityWithId.Id, valuesToSet);
                     if (propertiesToUnset.Count > 0)
-                        session.Connector.ExecuteUnset(metadata.EntityPath, entity.Id, propertiesToUnset);
+                        session.Connector.ExecuteUnset(metadata.EntityPath, entityAsEntityWithId.Id, propertiesToUnset);
 
-                    TEntity newEntity = LoadItem(entity.Id);
+                    TEntity newEntity = LoadItem(entityAsEntityWithId.Id);
                     items[i] = newEntity; //put saved&loaded entity into list instead of dirty old-one
                 }
             }
@@ -348,7 +358,7 @@ namespace Tik4Net
                 {
                     Logger.InfoFormat("DELETE: {0}", entity);
 
-                    session.Connector.ExecuteDelete(metadata.EntityPath, entity.Id);
+                    session.Connector.ExecuteDelete(metadata.EntityPath, ((ITikEntityWithId)entity).Id);
                     items.RemoveAt(i); //remove deleted entity from list
                 }
             }

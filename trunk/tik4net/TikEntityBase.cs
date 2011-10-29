@@ -10,7 +10,7 @@ namespace Tik4Net
     /// <summary>
     /// Base class for all strongly-typed Mikrotik entities.
     /// </summary>
-    public abstract class TikEntityBase: ITikEntity
+    public abstract class TikEntityBase : ITikEntity, IChangeTrackingEntity
     {
         private bool isMarkedDeleted = false;
         private bool isMarkedNew = false;
@@ -68,15 +68,15 @@ namespace Tik4Net
         }
 
         #region ITikEntity Members
-        /// <summary>
-        /// Gets the id of entity.
-        /// </summary>
-        /// <value>The entity id or null for new instance.</value>
-        [TikProperty(".id", typeof(string), true, TikPropertyEditMode.ReadOnly)]
-        public string Id
-        {
-            get { return properties.GetAsStringOrNull(".id"); }
-        }       
+        ///// <summary>
+        ///// Gets the id of entity.
+        ///// </summary>
+        ///// <value>The entity id or null for new instance.</value>
+        //[TikProperty(".id", typeof(string), true, TikPropertyEditMode.ReadOnly)]
+        //public string Id
+        //{
+        //    get { return properties.GetAsStringOrNull(".id"); }
+        //}       
 
         /// <summary>
         /// See <see cref="ITikEntity.LoadFromEntityRow"/> for details.
@@ -164,7 +164,13 @@ namespace Tik4Net
             properties.MarkClear();
         }
 
-        internal Dictionary<string, string> GetAllModifiedProperties()
+        /// <summary>
+        /// Gets all modified properties (for save purposses).
+        /// </summary>
+        /// <returns>(name,value) list of modified properties.</returns>
+        /// <remarks>Performs propertyType-}string conversions on property values.</remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        protected Dictionary<string, string> GetAllModifiedProperties()
         {
             TikEntityMetadata metadata = TikEntityMetadata.Get(GetType());
             Dictionary<string, string> result = new Dictionary<string, string>();
@@ -198,18 +204,29 @@ namespace Tik4Net
             return result;
         }
 
+        Dictionary<string, string> IChangeTrackingEntity.GetAllModifiedProperties()
+        {
+            return GetAllModifiedProperties();
+        }
+
         /// <summary>
         /// Assign property values and state flags from given <paramref name="entity"/>.
         /// </summary>
         /// <param name="entity">Source entity.</param>
-        public void Assign(TikEntityBase entity)
+        public virtual void Assign(object entity)
         {
+            Guard.ArgumentNotNull(entity, "entity");
+
+            TikEntityBase castedEntity = entity as TikEntityBase;
+            if (castedEntity == null)
+                throw new ArgumentException("Given entity is not of TikEntityBase type.", "entity");
+
             //assign flags
-            isMarkedDeleted = entity.isMarkedDeleted;
-            isMarkedNew = entity.isMarkedNew;
+            isMarkedDeleted = castedEntity.isMarkedDeleted;
+            isMarkedNew = castedEntity.isMarkedNew;
 
             //assign property values
-            properties = entity.Properties; //not very clear ... copy of values could be better solution!
+            properties = castedEntity.Properties; //not very clear ... there should be better solution for value-copy process!
         }
 
         /// <summary>

@@ -35,6 +35,7 @@
             System.Windows.Forms.Label label6;
             this.tcMain = new System.Windows.Forms.TabControl();
             this.tcpCredentials = new System.Windows.Forms.TabPage();
+            this.btnActivateConsole = new System.Windows.Forms.Button();
             this.tbPassword = new System.Windows.Forms.TextBox();
             this.tbUser = new System.Windows.Forms.TextBox();
             this.tbPort = new System.Windows.Forms.TextBox();
@@ -48,14 +49,13 @@
             this.tbConsoleOutput = new System.Windows.Forms.TextBox();
             this.tbConsoleInput = new System.Windows.Forms.TextBox();
             this.tcpParser = new System.Windows.Forms.TabPage();
+            this.btnParserGenerate = new System.Windows.Forms.Button();
             this.tbParserFile = new System.Windows.Forms.TextBox();
             this.btnParserSave = new System.Windows.Forms.Button();
             this.tbParserOutput = new System.Windows.Forms.TextBox();
             this.tcpSourceCode = new System.Windows.Forms.TabPage();
-            this.eSourceCodeCustom = new System.Windows.Forms.TextBox();
-            this.btnParserGenerate = new System.Windows.Forms.Button();
             this.eSourceCodeDesigner = new System.Windows.Forms.TextBox();
-            this.btnActivateConsole = new System.Windows.Forms.Button();
+            this.eSourceCodeCustom = new System.Windows.Forms.TextBox();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
@@ -145,13 +145,23 @@
             this.tcpCredentials.Text = "Credentials";
             this.tcpCredentials.UseVisualStyleBackColor = true;
             // 
+            // btnActivateConsole
+            // 
+            this.btnActivateConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnActivateConsole.Location = new System.Drawing.Point(9, 110);
+            this.btnActivateConsole.Name = "btnActivateConsole";
+            this.btnActivateConsole.Size = new System.Drawing.Size(309, 23);
+            this.btnActivateConsole.TabIndex = 12;
+            this.btnActivateConsole.Text = "Continue >";
+            this.btnActivateConsole.UseVisualStyleBackColor = true;
+            this.btnActivateConsole.Click += new System.EventHandler(this.btnActivateConsole_Click);
+            // 
             // tbPassword
             // 
             this.tbPassword.Location = new System.Drawing.Point(109, 84);
             this.tbPassword.Name = "tbPassword";
             this.tbPassword.Size = new System.Drawing.Size(209, 20);
             this.tbPassword.TabIndex = 7;
-            this.tbPassword.Text = "testp1234";
             // 
             // tbUser
             // 
@@ -159,7 +169,7 @@
             this.tbUser.Name = "tbUser";
             this.tbUser.Size = new System.Drawing.Size(209, 20);
             this.tbUser.TabIndex = 6;
-            this.tbUser.Text = "test";
+            this.tbUser.Text = "admin";
             // 
             // tbPort
             // 
@@ -175,7 +185,7 @@
             this.tbHost.Name = "tbHost";
             this.tbHost.Size = new System.Drawing.Size(209, 20);
             this.tbHost.TabIndex = 4;
-            this.tbHost.Text = "10.43.94.197";
+            this.tbHost.Text = "10.43.100.169";
             // 
             // tcpConsole
             // 
@@ -287,6 +297,17 @@
             this.tcpParser.Text = "Parser";
             this.tcpParser.UseVisualStyleBackColor = true;
             // 
+            // btnParserGenerate
+            // 
+            this.btnParserGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnParserGenerate.Location = new System.Drawing.Point(716, 4);
+            this.btnParserGenerate.Name = "btnParserGenerate";
+            this.btnParserGenerate.Size = new System.Drawing.Size(75, 23);
+            this.btnParserGenerate.TabIndex = 11;
+            this.btnParserGenerate.Text = "Generator >";
+            this.btnParserGenerate.UseVisualStyleBackColor = true;
+            this.btnParserGenerate.Click += new System.EventHandler(this.btnParserGenerate_Click);
+            // 
             // tbParserFile
             // 
             this.tbParserFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -331,27 +352,6 @@
             this.tcpSourceCode.Text = "Generate source code";
             this.tcpSourceCode.UseVisualStyleBackColor = true;
             // 
-            // eSourceCodeCustom
-            // 
-            this.eSourceCodeCustom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.eSourceCodeCustom.Location = new System.Drawing.Point(6, 6);
-            this.eSourceCodeCustom.Multiline = true;
-            this.eSourceCodeCustom.Name = "eSourceCodeCustom";
-            this.eSourceCodeCustom.Size = new System.Drawing.Size(787, 179);
-            this.eSourceCodeCustom.TabIndex = 6;
-            // 
-            // btnParserGenerate
-            // 
-            this.btnParserGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnParserGenerate.Location = new System.Drawing.Point(716, 4);
-            this.btnParserGenerate.Name = "btnParserGenerate";
-            this.btnParserGenerate.Size = new System.Drawing.Size(75, 23);
-            this.btnParserGenerate.TabIndex = 11;
-            this.btnParserGenerate.Text = "Generator >";
-            this.btnParserGenerate.UseVisualStyleBackColor = true;
-            this.btnParserGenerate.Click += new System.EventHandler(this.btnParserGenerate_Click);
-            // 
             // eSourceCodeDesigner
             // 
             this.eSourceCodeDesigner.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -363,16 +363,15 @@
             this.eSourceCodeDesigner.Size = new System.Drawing.Size(787, 246);
             this.eSourceCodeDesigner.TabIndex = 7;
             // 
-            // btnActivateConsole
+            // eSourceCodeCustom
             // 
-            this.btnActivateConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnActivateConsole.Location = new System.Drawing.Point(9, 110);
-            this.btnActivateConsole.Name = "btnActivateConsole";
-            this.btnActivateConsole.Size = new System.Drawing.Size(309, 23);
-            this.btnActivateConsole.TabIndex = 12;
-            this.btnActivateConsole.Text = "Continue >";
-            this.btnActivateConsole.UseVisualStyleBackColor = true;
-            this.btnActivateConsole.Click += new System.EventHandler(this.btnActivateConsole_Click);
+            this.eSourceCodeCustom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.eSourceCodeCustom.Location = new System.Drawing.Point(6, 6);
+            this.eSourceCodeCustom.Multiline = true;
+            this.eSourceCodeCustom.Name = "eSourceCodeCustom";
+            this.eSourceCodeCustom.Size = new System.Drawing.Size(787, 179);
+            this.eSourceCodeCustom.TabIndex = 6;
             // 
             // Form1
             // 

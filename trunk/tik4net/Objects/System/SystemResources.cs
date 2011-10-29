@@ -18,7 +18,7 @@ namespace Tik4Net.Objects.System
         {
             SystemResourceList list = new SystemResourceList();
             list.LoadAll();
-            return list.First();
+            return list.Single();
         }
     }
 

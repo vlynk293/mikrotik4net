@@ -101,7 +101,7 @@ namespace Tik4Net.ApiGenerator
                 propertyNode.Attributes.Append(result.CreateAttribute("mode"));
                 propertyNode.Attributes["mode"].Value = "auto";
                 propertyNode.Attributes.Append(result.CreateAttribute("editMode"));
-                propertyNode.Attributes["editMode"].Value = TikPropertyEditMode.Editable.ToString();
+                propertyNode.Attributes["editMode"].Value = property.Key == ".id" ? TikPropertyEditMode.ReadOnly.ToString() : TikPropertyEditMode.Editable.ToString();
 
                 root.AppendChild(propertyNode);
             }

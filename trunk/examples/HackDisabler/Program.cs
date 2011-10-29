@@ -22,9 +22,9 @@ namespace HackDisabler
      */
     class Program
     {
-        static string HOST = "10.43.94.197";
-        static string USER = "test";
-        static string PASS = "testp1234";
+        static string HOST = "192.168.88.1";
+        static string USER = "admin";
+        static string PASS = "";
         static string DROP_ADDR_LIST = "TO-DROP"; //use this addresslist in firewal-filter to drop packets
         static string IP_PREFIX_WHITELIST = "10.43"; //typycally private network prefix - 
         static List<string> checkedTechnology = new List<string> { "ssh", "telnet", "winbox", "ftp" }; //disable only if login error was via specified technology
