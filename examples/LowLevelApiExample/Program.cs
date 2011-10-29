@@ -26,6 +26,10 @@ namespace LowLevelApiExample
             using (TikSession session = new TikSession(TikConnectorType.Api))
             {
                 session.Open(HOST, USER, PASS);
+
+                Tik4Net.Objects.System.SystemResource resource = Tik4Net.Objects.System.SystemResource.LoadInstance();
+
+
                 IApiConnector apiConnector = (IApiConnector)session.Connector;
 
                 //ip-scan example

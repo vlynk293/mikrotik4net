@@ -13,6 +13,8 @@ namespace MergeExample
         {
             using (TikSession session = new TikSession(TikConnectorType.Api))
             {
+                //REMARS - works without access to mikrotik router
+
                 FirewallMangleList dest = CreateList();
                 FirewallMangleList srcTmp = CreateList();
 

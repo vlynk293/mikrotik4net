@@ -42,15 +42,31 @@ namespace Tik4Net.ApiGenerator
             string entityNamespace = rootNode.Attributes["entityNamespace"].Value;
             string entityExampleRow = rootNode.Attributes["entityExampleRow"].Value;
             string entityEditMode = rootNode.Attributes["editMode"].Value;
+            string entityReaderFlags;
+            if (rootNode.Attributes["readerFlags"] == null)
+                entityReaderFlags = typeof(Tik4Net.Connector.ExecuteReaderBehaviors).FullName + "." + Tik4Net.Connector.ExecuteReaderBehaviors.None.ToString();
+            else
+                entityReaderFlags = string.Join("|", rootNode.Attributes["readerFlags"].Value.Split(',').Select(s=>typeof(Tik4Net.Connector.ExecuteReaderBehaviors).FullName + "." + s.Trim()).ToArray());
             TikListMode listMode = (TikListMode)Enum.Parse(typeof(TikListMode), rootNode.Attributes["listMode"].Value, true);
             string setterPossibleRem;
+            string listRwMethods;
+            bool isListEditable;
             if (entityEditMode == "ReadOnly")
+            {
                 setterPossibleRem = "// Entity R/O ";
+                listRwMethods = ""; //remove
+                isListEditable = false;
+            }
             else
+            {
                 setterPossibleRem = "";
+                listRwMethods = Resources.ListRWMethodsTemplate;
+                isListEditable = true;
+            }
             
             //properties
-            List<string> fieldsAlreadyImplementedInBaseClass = new List<string>(new string[] { ".id" });
+            bool containsIdProperty = rootNode.SelectSingleNode("property[@name=\".id\"]") != null;
+            List<string> fieldsAlreadyImplementedInBaseClass = new List<string>(new string[] { /*".id" - is not in all objects -> moved to generated class*/});
             List<string> autoPropertiesSource = new List<string>();
             List<string> customPropertiesSource = new List<string>();
             foreach (XmlNode propertyNode in rootNode.SelectNodes("property"))
@@ -119,7 +135,11 @@ namespace Tik4Net.ApiGenerator
                 .Replace("%EntityDataRow%", entityExampleRow)
                 .Replace("%DateTime%", DateTime.Now.ToString())
                 .Replace("%EditMode%", entityEditMode)
-                .Replace("%ListType%", StringHelper.GetListClassFromListMode(listMode));
+                .Replace("%ListType%", StringHelper.GetListClassFromListMode(listMode))
+                .Replace("%PossibleITikEntityWithId%", containsIdProperty ? ", ITikEntityWithId" : "")
+                .Replace("%PossibleRWMethods%", listRwMethods /*or empty string*/)
+                .Replace("%PossibleIEditableTikList%", isListEditable ? ", IEditableTikList" : "")
+                .Replace("%EntityReadFlags%", entityReaderFlags); 
             customCodeTemplate = Resources.CustomClassTemplate
                 .Replace("%EntityDotedPath%", string.IsNullOrEmpty(entityNamespace) ? "" : "." + entityNamespace)
                 .Replace("%EntityPath%", entityPath)

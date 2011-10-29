@@ -10,7 +10,22 @@ namespace Tik4Net.Objects.Ip.Firewall
     /// </summary>
     public sealed partial class FirewallAddressList: TikEntityBase
     {
-        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirewallAddressList"/> class.
+        /// </summary>
+        public FirewallAddressList()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirewallAddressList"/> class.
+        /// </summary>
+        /// <param name="addressListName">Name of the address list.</param>
+        public FirewallAddressList(string addressListName)
+            : this()
+        {
+            List = addressListName;
+        }
     }
 
     /// <summary>

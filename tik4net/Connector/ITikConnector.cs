@@ -89,18 +89,19 @@ namespace Tik4Net.Connector
         /// Queries the data rows (rows from which data entities can be constructed).
         /// </summary>
         /// <param name="entityPath">The entity (in x/y/z API notation).</param>
+        /// <param name="readerBehavior">The flags modifing execute reader behavior.</param>
         /// <returns>List of parsed data rows.</returns>
-        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior);
 
         /// <summary>
-        /// Version of <see cref="ExecuteReader(string)"/> with list of properties to be read.
+        /// Version of <see cref="ExecuteReader(string, ExecuteReaderBehaviors)"/> with list of properties to be read.
         /// </summary>
-        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior, IEnumerable<string> propertyList);
 
         /// <summary>
-        /// Version of <see cref="ExecuteReader(string)"/> with list of properties to be read and list of proName-propValue filter pairs.
+        /// Version of <see cref="ExecuteReader(string, ExecuteReaderBehaviors)"/> with list of properties to be read and list of proName-propValue filter pairs.
         /// </summary>
-        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
+        IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter);
         
         /// <summary>
         /// Executes creation command for entity with given values.

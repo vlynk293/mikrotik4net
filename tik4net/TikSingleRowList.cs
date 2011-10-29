@@ -13,8 +13,8 @@ namespace Tik4Net
     /// <seealso cref="TikListMode.SingleRow"/>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public abstract class TikSingleRowList<TEntity>: TikListBase<TEntity> 
-        where TEntity : TikEntityBase, new()
+    public abstract class TikSingleRowList<TEntity>: TikListBase<TEntity>
+        where TEntity : ITikEntity, IChangeTrackingEntity, new() 
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TikSingleRowList&lt;TEntity&gt;"/> class.

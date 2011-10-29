@@ -86,7 +86,7 @@ namespace Tik4Net.ApiGenerator
             switch (mode)
             {
                 case TikListMode.Ordered:
-                    return "TikList"; //TODO from typeof(TikList)
+                    return "TikOrderedList"; //TODO from typeof(TikList)
                 case TikListMode.NotOrdered:
                     return "TikUnorderedList";
                 case TikListMode.SingleRow:

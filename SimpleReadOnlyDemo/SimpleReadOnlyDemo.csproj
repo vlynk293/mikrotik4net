@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DC02E59B-9955-4197-88AF-0A32C5421A2D}</ProjectGuid>
+    <ProjectGuid>{21E43133-DF53-4FDF-81A9-B93BCCF03195}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MergeExample</RootNamespace>
-    <AssemblyName>MergeExample</AssemblyName>
+    <RootNamespace>SimpleReadOnlyDemo</RootNamespace>
+    <AssemblyName>SimpleReadOnlyDemo</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

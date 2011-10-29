@@ -64,6 +64,15 @@ namespace Tik4Net
         }
 
         /// <summary>
+        /// Gets the read flags (modifies ExecuteReader behavior).
+        /// </summary>
+        /// <value>The read flags (modifies ExecuteReader behavior).</value>
+        public Tik4Net.Connector.ExecuteReaderBehaviors ReaderBehavior
+        {
+            get { return entityInfo.ReaderBehavior; }
+        }
+
+        /// <summary>
         /// Gets the list of property (mikrotik properties) names in entity.
         /// All properties should be marked by <see cref="TikPropertyAttribute"/>.
         /// </summary>

@@ -71,7 +71,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -92,8 +92,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
+    <Compile Include="Connector\ExecuteReaderBehaviors.cs" />
     <Compile Include="Connector\Api\IApiConnector.cs" />
     <Compile Include="Connector\ILogConnector.cs" />
+    <Compile Include="IChangeTrackingEntity.cs" />
+    <Compile Include="IEditableTikList.cs" />
+    <Compile Include="ITikEntityWithId.cs" />
     <Compile Include="Logging\DummyLog.cs" />
     <Compile Include="Logging\DummyLogFactory.cs" />
     <Compile Include="Logging\ILog.cs" />
@@ -158,7 +162,7 @@
     <Compile Include="TikEntityAttribute.cs" />
     <Compile Include="TikEntityMetadata.cs" />
     <Compile Include="TikEntityEditMode.cs" />
-    <Compile Include="TikList.cs" />
+    <Compile Include="TikOrderedList.cs" />
     <Compile Include="TikListMode.cs" />
     <Compile Include="TikPropertyEditMode.cs" />
     <Compile Include="TikPropertyList.cs" />

@@ -9,14 +9,9 @@ namespace Tik4Net
     /// Interface implemented by all entity objects that are able
     /// to load itself from <see cref="ITikEntityRow"/>. See <see cref="LoadFromEntityRow"/>.
     /// </summary>
+    /// <see cref="IChangeTrackingEntity"/>
     public interface ITikEntity
     {
-        /// <summary>
-        /// Gets the id value.
-        /// </summary>
-        /// <value>The id value.</value>
-        string Id { get; }
-
         /// <summary>
         /// Loads entity state from given data row.
         /// </summary>
@@ -31,5 +26,11 @@ namespace Tik4Net
         /// 	<c>true</c> if is data-equal with the specified entity; otherwise, <c>false</c>.
         /// </returns>
         bool IsDataEqual(ITikEntity entity);
+
+        /// <summary>
+        /// Assign property values and state flags from given <paramref name="entity"/>.
+        /// </summary>
+        /// <param name="entity">Source entity (must be identical of type).</param>
+        void Assign(object entity);
     }
 }

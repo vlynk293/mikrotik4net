@@ -14,7 +14,7 @@ namespace Tik4Net
     /// <seealso cref="TikListMode.NotOrdered"/>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public class TikUnorderedList<TEntity>: TikListBase<TEntity> 
-        where TEntity : TikEntityBase, new()
+        where TEntity : ITikEntity, IChangeTrackingEntity, ITikEntityWithId, new()
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TikUnorderedList&lt;TEntity&gt;"/> class.
@@ -56,7 +56,7 @@ namespace Tik4Net
         /// <param name="subset">The subset in this list (the same filter as in <paramref name="data"/>).</param>
         /// <param name="data">The data to be metged into this list.</param>
         /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
-        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
+        /// <param name="updateDataAction">The update data action (dst, src) - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
         /// <remarks><see cref="TikUnorderedList{TEntity}"/> is not ordered -} method doesn't care about order of items.</remarks>
         /// <seealso cref="Merge"/>
         public void MergeSubset(IEnumerable<TEntity> subset, IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
@@ -102,7 +102,7 @@ namespace Tik4Net
         /// </summary>
         /// <param name="data">The data to be metged into this list.</param>
         /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
-        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
+        /// <param name="updateDataAction">The update data action (dst, src)- called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
         /// <remarks><see cref="TikUnorderedList{TEntity}"/> is not ordered -} method doesn't care about order of items.</remarks>
         /// <seealso cref="MergeSubset"/>
         public void Merge(IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)

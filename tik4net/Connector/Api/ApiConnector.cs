@@ -195,17 +195,17 @@ namespace Tik4Net.Connector.Api
         }
 
         /// <summary>
-        /// See <see cref="ITikConnector.ExecuteReader(string)"/> for details.
+        /// See <see cref="ITikConnector.ExecuteReader(string, ExecuteReaderBehaviors)"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath)
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior)
         {
-            return ExecuteReader(entityPath, null);
+            return ExecuteReader(entityPath, readerBehavior, null);
         }
 
         /// <summary>
-        /// See <see cref="ITikConnector.ExecuteReader(string,IEnumerable{string})"/> for details.
+        /// See <see cref="ITikConnector.ExecuteReader(string, ExecuteReaderBehaviors,IEnumerable{string})"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList)
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior, IEnumerable<string> propertyList)
         {
             //Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
             //EnsureLoggedOn();
@@ -214,20 +214,24 @@ namespace Tik4Net.Connector.Api
             //    propertyList, null, new Dictionary<string, string>{ { "=detail", "" } });
 
             //return result;
-            return ExecuteReader(entityPath, propertyList, null);
+            return ExecuteReader(entityPath, readerBehavior, propertyList, null);
         }
 
         /// <summary>
-        /// See <see cref="ITikConnector.ExecuteReader(string,IEnumerable{string},TikConnectorQueryFilterDictionary)"/> for details.
+        /// See <see cref="ITikConnector.ExecuteReader(string, ExecuteReaderBehaviors,IEnumerable{string},TikConnectorQueryFilterDictionary)"/> for details.
         /// </summary>
-        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
+        public IEnumerable<ITikEntityRow> ExecuteReader(string entityPath, ExecuteReaderBehaviors readerBehavior, IEnumerable<string> propertyList, TikConnectorQueryFilterDictionary filter)
         {
             Guard.ArgumentNotNullOrEmptyString(entityPath, "entityPath");
             //Guard.ArgumentNotNull(filter, "filter");
             EnsureLoggedOn();
 
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if ((readerBehavior & ExecuteReaderBehaviors.ExcludeDetails) == 0)
+                parameters.Add("=detail", "");
+
             List<ITikEntityRow> result = ExecuteReaderInternal(string.Format(CultureInfo.InvariantCulture, "{0}/print", entityPath), 
-                propertyList, filter, new Dictionary<string, string>{ { "=detail", "" } });
+                propertyList, filter, parameters);
 
             return result;
         }
@@ -246,7 +250,7 @@ namespace Tik4Net.Connector.Api
                 allParameters = new Dictionary<string,string>(parameters);
             else
                 allParameters = new Dictionary<string, string>(); 
-
+            
             //propList
             if ((propertyList != null) && propertyList.Any()) //.proplist  (if specified)
                 allParameters.Add("=.proplist", string.Join(",", propertyList.ToArray()));

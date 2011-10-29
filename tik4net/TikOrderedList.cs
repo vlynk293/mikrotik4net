@@ -15,8 +15,8 @@ namespace Tik4Net
     /// <seealso cref="TikListMode.Ordered"/>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public class TikList<TEntity> : TikListBase<TEntity> 
-        where TEntity : TikEntityBase, new()
+    public class TikOrderedList<TEntity> : TikListBase<TEntity>
+        where TEntity : ITikEntity, IChangeTrackingEntity, ITikEntityWithId, new()
     {
         private readonly Dictionary<TEntity, TEntity> entityMoves = new Dictionary<TEntity, TEntity>(); //<entityToMove,entityToMoveBefore>
 
@@ -36,19 +36,19 @@ namespace Tik4Net
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikList&lt;TEntity&gt;"/> class.
+        /// Initializes a new instance of the <see cref="TikOrderedList&lt;TEntity&gt;"/> class.
         /// Default active session (<see cref="TikSession.ActiveSession"/> is used).
         /// </summary>
-        protected TikList() 
+        protected TikOrderedList() 
             : base()
         {         
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TikList&lt;TEntity&gt;"/> class.
+        /// Initializes a new instance of the <see cref="TikOrderedList&lt;TEntity&gt;"/> class.
         /// </summary>
         /// <param name="session">The session used to access mikrotik.</param>
-        protected TikList(TikSession session)
+        protected TikOrderedList(TikSession session)
             : base(session)
         {
         }
@@ -85,7 +85,7 @@ namespace Tik4Net
         /// Moves the specified <paramref name="entityToMove"/> before another <paramref name="entityToMoveBefore"/>.
         /// <para>
         /// Entity is moved in internal list of items and info about move is stored in internal list of moves 
-        /// to enable perform this move during <see cref="TikListBase{TEntity}.Save"/> process.
+        /// to enable perform this move during <see cref="IEditableTikList.Save"/> (<see cref="TikListBase{TEntity}.SaveInternal"/>) process.
         /// </para>
         /// </summary>
         /// <remarks>
@@ -147,7 +147,7 @@ namespace Tik4Net
                 Items.Remove(entityToMove);
                 Items.Add(entityToMove);
 
-                entityMoves.Add(entityToMove, null);
+                entityMoves.Add(entityToMove, default(TEntity));
             }
         }
 
@@ -319,7 +319,7 @@ namespace Tik4Net
                 if (firstItemAfterSubsetIdx + 1 < Items.Count)
                     positionRefEntity = Items[firstItemAfterSubsetIdx + 1];
                 else
-                    positionRefEntity = null; //add to end
+                    positionRefEntity = default(TEntity); //add to end
             }
 
             //merge
@@ -386,12 +386,12 @@ namespace Tik4Net
         /// </summary>
         /// <param name="data">The data to be metged into this list.</param>
         /// <param name="keyExtractor">The key extractor - should return key from given entity (not .id property) - items with the same key are treated as the same instances.</param>
-        /// <param name="updateDataAction">The update data action - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item. (dst,src)</param>
+        /// <param name="updateDataAction">The update data action (dst, src) - called to assign entity data from <paramref name="data"/> item into <paramref name="subset"/> item.</param>
         /// <remarks>Methods does take care about order of items and performs <see cref="Move"/> methods to reorder <paramref name="subset"/> to the same order as are in <paramref name="data"/>.</remarks>
         /// <seealso cref="MergeSubset"/>
         public void Merge(IEnumerable<TEntity> data, Func<TEntity, object> keyExtractor, Action<TEntity, TEntity> updateDataAction)
         {
-            MergeSubset(this, data, null, keyExtractor, updateDataAction);
+            MergeSubset(this, data, default(TEntity), keyExtractor, updateDataAction);
         }
 
         /// <summary>
