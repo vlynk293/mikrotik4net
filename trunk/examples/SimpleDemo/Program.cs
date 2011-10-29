@@ -5,6 +5,9 @@ using System.Windows.Forms;
 
 namespace Simple
 {
+    /*
+     * REMARKS: this sample has not been validated
+     */
     static class Program
     {
         /// <summary>
