@@ -1,0 +1,9 @@
+        /// <summary>
+        /// Row %PropertyDataName% property.
+        /// </summary>
+        [TikProperty("%PropertyDataName%", typeof(%FieldType%), %Mandatory%, TikPropertyEditMode.%PropertyEditMode%)]
+        public %FieldType% %PropertyName% 
+        { 
+            get { return Properties.%GetMethod%("%PropertyDataName%"); }
+            %SetterPossibleRem%set { Properties.SetPropertyValue("%PropertyDataName%", value); }
+        }        	

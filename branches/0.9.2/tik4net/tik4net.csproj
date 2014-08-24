@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C4EC2588-1278-4AB7-92A6-F41CC71B88C1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tik4Net</RootNamespace>
+    <AssemblyName>tik4net</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\tik4net.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\tik4net.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Code analysis|AnyCPU' ">
+    <OutputPath>bin\Code analysis\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <DocumentationFile>bin\Code analysis\tik4net.XML</DocumentationFile>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Code analysis|x86' ">
+    <OutputPath>bin\x86\Code analysis\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Connector\Api\ApiConnectorHelper.cs" />
+    <Compile Include="Connector\ExecuteReaderBehaviors.cs" />
+    <Compile Include="Connector\Api\IApiConnector.cs" />
+    <Compile Include="Connector\ILogConnector.cs" />
+    <Compile Include="IChangeTrackingEntity.cs" />
+    <Compile Include="IEditableTikList.cs" />
+    <Compile Include="ITikEntityWithId.cs" />
+    <Compile Include="Logging\DummyLog.cs" />
+    <Compile Include="Logging\DummyLogFactory.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\ILogFactory.cs" />
+    <Compile Include="Logging\SystemDiagnosticsLog.cs" />
+    <Compile Include="Logging\SystemDiagnosticsLogFactory.cs" />
+    <Compile Include="Objects\Interface.cs" />
+    <Compile Include="Objects\Interface.designer.cs">
+      <DependentUpon>Interface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Interfaces\InterfaceEthernet.cs" />
+    <Compile Include="Objects\Interfaces\InterfaceEthernet.designer.cs">
+      <DependentUpon>InterfaceEthernet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Interfaces\InterfaceWireless.cs" />
+    <Compile Include="Objects\Interfaces\InterfaceWireless.designer.cs">
+      <DependentUpon>InterfaceWireless.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallAddressList.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallAddressList.designer.cs">
+      <DependentUpon>FirewallAddressList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallFilter.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallFilter.designer.cs">
+      <DependentUpon>FirewallFilter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallMangle.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallMangle.designer.cs">
+      <DependentUpon>FirewallMangle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\Firewall\FirewallNat.cs" />
+    <Compile Include="Objects\Ip\Firewall\FirewallNat.designer.cs">
+      <DependentUpon>FirewallNat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Ip\IpAddress.cs" />
+    <Compile Include="Objects\Ip\IpAddress.designer.cs">
+      <DependentUpon>IpAddress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Log.cs" />
+    <Compile Include="Objects\Log.designer.cs">
+      <DependentUpon>Log.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\LogLevel.cs" />
+    <Compile Include="Objects\Queue\QueueSimple.cs" />
+    <Compile Include="Objects\Queue\QueueSimple.designer.cs">
+      <DependentUpon>QueueSimple.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Queue\QueueTree.cs" />
+    <Compile Include="Objects\Queue\QueueTree.designer.cs">
+      <DependentUpon>QueueTree.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Queue\QueueType.cs" />
+    <Compile Include="Objects\Queue\QueueType.designer.cs">
+      <DependentUpon>QueueType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\System\SystemResources.cs" />
+    <Compile Include="Objects\System\SystemResources.designer.cs">
+      <DependentUpon>SystemResources.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TikConnectorQueryFilterDictionary.cs" />
+    <Compile Include="TikConnectorType.cs" />
+    <Compile Include="TikEntityAttribute.cs" />
+    <Compile Include="TikEntityMetadata.cs" />
+    <Compile Include="TikEntityEditMode.cs" />
+    <Compile Include="TikOrderedList.cs" />
+    <Compile Include="TikListMode.cs" />
+    <Compile Include="TikPropertyEditMode.cs" />
+    <Compile Include="TikPropertyList.cs" />
+    <Compile Include="TikPropertyItem.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Guard.cs" />
+    <Compile Include="ITikList.cs" />
+    <Compile Include="ITikEntity.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TikListBase.cs" />
+    <Compile Include="TikEntityBase.cs" />
+    <Compile Include="Connector\Api\ApiEntityRow.cs" />
+    <Compile Include="Connector\Api\ApiConnector.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ITikEntityRow.cs" />
+    <Compile Include="Connector\ITikConnector.cs" />
+    <Compile Include="Connector\TikResponseParseException.cs" />
+    <Compile Include="Connector\TikConnectorException.cs" />
+    <Compile Include="TikPropertyAttribute.cs" />
+    <Compile Include="TikUnorderedList.cs" />
+    <Compile Include="TikSession.cs" />
+    <Compile Include="TikSingleRowList.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sn.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Connector\Ssh\" />
+    <Folder Include="Connector\Telnet\" />
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)\tools\"  /R /Y</PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,9 @@
+        /// <summary>
+        /// Saves this instance - saves all entities that are in <see cref="TikEntityBase.IsModified"/>, 
+        /// <see cref="TikEntityBase.IsMarkedDeleted"/> and <see cref="TikEntityBase.IsMarkedNew"/> states.
+        /// Uses session from constructor.
+        /// </summary>        
+        public void Save()
+        {
+			SaveInternal();
+		}        
